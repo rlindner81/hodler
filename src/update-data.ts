@@ -38,8 +38,7 @@ const loadDataForSymbols = async (list: Array<Stock>) =>
   await Promise.all(list.map(({ symbol }) => loadDataForSymbol(symbol)));
 
 const main = async () => {
-  const data = await loadDataForSymbols(STOCKS);
-  console.log(data);
+  await loadDataForSymbols(STOCKS);
   const i = 0;
 };
 
