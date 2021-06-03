@@ -1,0 +1,21 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "type": "pwa-node",
+      "request": "launch",
+      "name": "update-data",
+      "program": "${workspaceFolder}/src/update-data.ts",
+      "cwd": "${workspaceFolder}",
+      "runtimeExecutable": "deno",
+      "runtimeArgs": [
+        "run",
+        "--unstable",
+        "--allow-all",
+        "--inspect-brk=127.0.0.1:9229",
+      ],
+      "outputCapture": "std",
+      "attachSimplePort": 9229,
+    }
+  ]
+}

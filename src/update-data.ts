@@ -1,11 +1,10 @@
-"use strict";
+import {
+  exists
+} from "https://deno.land/std@0.97.0/fs/mod.ts";
 
-const { URL } = require("url");
-const { readFile, writeFile, access } = require("fs").promises;
-const { promisify } = require("util");
-const fetch = require("node-fetch");
 
 const DATA_FILE = "data-stic.json";
+const TRADIER_APIKEY_ENV_VAR = "TRADIER_APIKEY";
 const TRADIER_HOST = new URL("https://sandbox.tradier.com/");
 const STOCKS = [
   { symbol: "STIC" },
@@ -22,7 +21,7 @@ const STOCKS = [
 ];
 
 
-const getMarketHistory = async (symbol) => {
+const getMarketHistory = async (symbol: string) => {
   const nowDate = new Date();
   const start = `${nowDate.getFullYear()}-01-01`;
   const end = nowDate.toISOString().slice(0, 10);
@@ -31,34 +30,31 @@ const getMarketHistory = async (symbol) => {
     symbol,
     start,
     end
-  });
+  }).toString();
   const headers = {
     "Accept": "application/json",
-    "Authorization": `Bearer ${process.env.TRADIER_APIKEY}`
+    "Authorization": `Bearer ${Deno.env.get(TRADIER_APIKEY_ENV_VAR)}`
   };
   const reponse = await fetch(tradierUrl.toString(), { headers });
   return reponse.json();
 }
 
-const getMarketQuotes = async (symbols) => {
+const getMarketQuotes = async (symbols: string) => {
   const tradierUrl = new URL("/v1/markets/quotes", TRADIER_HOST);
-  tradierUrl.search = new URLSearchParams({ symbols });
+  tradierUrl.search = new URLSearchParams({ symbols }).toString();
   const headers = {
     "Accept": "application/json",
-    "Authorization": `Bearer ${process.env.TRADIER_APIKEY}`
+    "Authorization": `Bearer ${Deno.env.get(TRADIER_APIKEY_ENV_VAR)}`
   };
   const reponse = await fetch(tradierUrl.toString(), { headers });
   return reponse.json();
 }
 
 const loadData = async () => {
-  try {
-    const dataRaw = await readFile(DATA_FILE);
-    return JSON.parse(dataRaw);
-  } catch (err) {
-    if (err.code !== "ENOENT") {
-      throw err;
-    }
+  if (await exists(DATA_FILE)) {
+    const dataRaw = await Deno.readFile(DATA_FILE);
+    const dataText = new TextDecoder("utf-8").decode(dataRaw);
+    return JSON.parse(dataText);
   }
 
   // const symbols = STOCKS.map(({ symbol }) => symbol);
@@ -66,7 +62,9 @@ const loadData = async () => {
 
   const symbol = "STIC";
   const data = await getMarketHistory(symbol);
-  await writeFile(DATA_FILE, JSON.stringify(data, null, 2));
+  const dataText = JSON.stringify(data, null, 2) + "\n";
+  const dataRaw = new TextEncoder().encode(dataText);
+  await Deno.writeFile(DATA_FILE, dataRaw);
   return data;
 };
 
