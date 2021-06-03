@@ -1,8 +1,9 @@
 import { exists } from "https://deno.land/std@0.97.0/fs/mod.ts";
 import { getMarketHistory } from "./tradier.ts";
 
-const DATA_FILE = "data-stic.json";
-const STOCKS = [
+type Stock = Record<"symbol", string>;
+
+const STOCKS: Array<Stock> = [
   { symbol: "BARK" },
   { symbol: "CRSR" },
   { symbol: "STOR" },
@@ -16,26 +17,28 @@ const STOCKS = [
   // CD PROJEKT
 ];
 
-const loadData = async () => {
-  if (await exists(DATA_FILE)) {
-    const dataRaw = await Deno.readFile(DATA_FILE);
+const dataFileForSymbol = (symbol: string) => `data-${symbol}.json`;
+
+const loadDataForSymbol = async (symbol: string) => {
+  const file = dataFileForSymbol(symbol);
+  if (await exists(file)) {
+    const dataRaw = await Deno.readFile(file);
     const dataText = new TextDecoder("utf-8").decode(dataRaw);
     return JSON.parse(dataText);
   }
 
-  // const symbols = STOCKS.map(({ symbol }) => symbol);
-  // const data = await getMarketQuotes(symbols);
-
-  const symbol = "STIC";
   const data = await getMarketHistory(symbol);
   const dataText = JSON.stringify(data, null, 2) + "\n";
   const dataRaw = new TextEncoder().encode(dataText);
-  await Deno.writeFile(DATA_FILE, dataRaw);
+  await Deno.writeFile(file, dataRaw);
   return data;
 };
 
+const loadDataForSymbols = async (list: Array<Stock>) =>
+  await Promise.all(list.map(({ symbol }) => loadDataForSymbol(symbol)));
+
 const main = async () => {
-  const data = await loadData();
+  const data = await loadDataForSymbols(STOCKS);
   console.log(data);
   const i = 0;
 };
