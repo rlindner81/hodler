@@ -7,7 +7,7 @@ const DATA_FILE = "data-stic.json";
 const TRADIER_APIKEY_ENV_VAR = "TRADIER_APIKEY";
 const TRADIER_HOST = new URL("https://sandbox.tradier.com/");
 const STOCKS = [
-  { symbol: "STIC" },
+  { symbol: "BARK" },
   { symbol: "CRSR" },
   { symbol: "STOR" },
   { symbol: "BOWX" },
