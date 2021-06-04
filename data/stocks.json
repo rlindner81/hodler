@@ -1,12 +1,30 @@
 [
-  { "symbol": "BARK" },
-  { "symbol": "CRSR" },
-  { "symbol": "STOR" },
-  { "symbol": "BOWX" },
-  { "symbol": "CCL" },
-  { "symbol": "CCIV" },
-  { "symbol": "PLTR" },
-  { "symbol": "TWTR" },
-  { "symbol": "AMD" },
-  { "symbol": "DIS" }
+  {
+    "symbol": "BARK",
+    "amount": 830
+  },
+  {
+    "symbol": "CRSR",
+    "amount": 400
+  },
+  {
+    "symbol": "STOR",
+    "amount": 400
+  },
+  {
+    "symbol": "BOWX",
+    "amount": 1000
+  },
+  {
+    "symbol": "CCL",
+    "amount": 2000
+  },
+  {
+    "symbol": "CCIV",
+    "amount": 1700
+  },
+  { "symbol": "PLTR", "amount": 1000 },
+  { "symbol": "TWTR", "amount": 360 },
+  { "symbol": "AMD", "amount": 320 },
+  { "symbol": "DIS", "amount": 200 }
 ]
