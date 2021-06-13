@@ -19,6 +19,22 @@
       "attachSimplePort": 9229
     },
     {
+      "name": "options-quotes",
+      "type": "pwa-node",
+      "request": "launch",
+      "program": "${workspaceFolder}/src/options-quotes.ts",
+      "cwd": "${workspaceFolder}",
+      "runtimeExecutable": "deno",
+      "runtimeArgs": [
+        "run",
+        "--unstable",
+        "--allow-all",
+        "--inspect-brk=127.0.0.1:9229",
+      ],
+      "outputCapture": "std",
+      "attachSimplePort": 9229
+    },
+    {
       "name": "attach",
       "type": "node",
       "request": "attach",
