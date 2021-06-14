@@ -1,6 +1,8 @@
 const TRADIER_APIKEY_ENV_VAR = "TRADIER_APIKEY";
 const TRADIER_HOST = new URL("https://sandbox.tradier.com/");
 
+// TODO wrap fetch with some error handling...
+
 interface Quote {
   symbol: string,
   bid: number,
@@ -10,6 +12,7 @@ interface Quote {
   low: number,
   close: number
 }
+
 type Quotes = Record<"quotes", Record<"quote", Array<Quote>>>;
 
 const getMarketHistory = async (symbol: string) => {
@@ -26,19 +29,19 @@ const getMarketHistory = async (symbol: string) => {
     "Accept": "application/json",
     "Authorization": `Bearer ${Deno.env.get(TRADIER_APIKEY_ENV_VAR)}`,
   };
-  const reponse = await fetch(tradierUrl.toString(), { headers });
+  const reponse = await fetch(tradierUrl.toString(), {headers});
   return reponse.json();
 };
 
 const getMarketQuotes = async (symbols: Array<string>): Promise<Quotes> => {
   const tradierUrl = new URL("/v1/markets/quotes", TRADIER_HOST);
-  tradierUrl.search = new URLSearchParams({ symbols: symbols.join(",") }).toString();
+  tradierUrl.search = new URLSearchParams({symbols: symbols.join(",")}).toString();
   const headers = {
     "Accept": "application/json",
     "Authorization": `Bearer ${Deno.env.get(TRADIER_APIKEY_ENV_VAR)}`,
   };
-  const reponse = await fetch(tradierUrl.toString(), { headers });
+  const reponse = await fetch(tradierUrl.toString(), {headers});
   return reponse.json();
 };
 
-export { getMarketHistory, getMarketQuotes };
+export {getMarketHistory, getMarketQuotes};
