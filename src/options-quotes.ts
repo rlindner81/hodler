@@ -13,12 +13,12 @@ const main = async () => {
       ({symbol, bid, ask, open, high, low, close}) =>
         [
           symbol,
-          bid.toFixed(2),
-          ask.toFixed(2),
-          open.toFixed(2),
-          high.toFixed(2),
-          low.toFixed(2),
-          close.toFixed(2)
+          bid ? bid.toFixed(2) : "",
+          ask ? ask.toFixed(2) : "",
+          open ? open.toFixed(2) : "",
+          high ? high.toFixed(2) : "",
+          low ? low.toFixed(2) : "",
+          close ? close.toFixed(2): ""
         ]
     )
   );
