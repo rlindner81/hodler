@@ -22,7 +22,10 @@ const main = async () => {
         ]
     )
   );
-  console.log(table(tableData, {sortCol: null}));
+  console.log(table(tableData, {
+    sortCol: null,
+    columnAlign: ["left", "right", "right", "right", "right", "right", "right"]
+  }));
 };
 
 await main();
