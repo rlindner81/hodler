@@ -43,7 +43,8 @@ const table = (table: Table, {sortCol = 0, noHeader = false, columnAlign = []}: 
       row
         .slice(0, columnCount)
         .map((cell, columnIndex) =>
-          Array.isArray(columnAlign)
+          (noHeader || columnIndex > 0)
+          && Array.isArray(columnAlign)
           && columnAlign.length > columnIndex
           && columnAlign[columnIndex] === "right"
             ? " ".repeat(columnWidth[columnIndex] - String(cell).length) + cell
