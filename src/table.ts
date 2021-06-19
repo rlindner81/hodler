@@ -37,11 +37,11 @@ const table = (table: Table, {sortCol = 0, noHeader = false, columnAlign = ""}: 
   const sortedTable = noHeader ? table : [header].concat(body);
 
   return sortedTable
-    .map((row) =>
+    .map((row, rowIndex) =>
       row
         .slice(0, columnCount)
         .map((cell, columnIndex) =>
-          (noHeader || columnIndex > 0)
+          (noHeader || rowIndex > 0)
           && columnAlign.length > columnIndex
           && columnAlign[columnIndex] === "r"
             ? " ".repeat(columnWidth[columnIndex] - String(cell).length) + cell
