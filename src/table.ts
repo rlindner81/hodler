@@ -1,4 +1,4 @@
-type TableCell = any;
+type TableCell = string | number | boolean;
 type TableRow = Array<TableCell>;
 type Table = Array<TableRow>;
 
@@ -29,8 +29,8 @@ const table = (table: Table, {sortCol = 0, noHeader = false, columnAlign = ""}: 
   && Number.isInteger(sortCol)
   && sortCol < columnCount
   && body.sort((rowA, rowB) => {
-    const cellA = rowA[sortCol] ? rowA[sortCol].toUpperCase() : "";
-    const cellB = rowB[sortCol] ? rowB[sortCol].toUpperCase() : "";
+    const cellA = rowA[sortCol] ? String(rowA[sortCol]).toUpperCase() : "";
+    const cellB = rowB[sortCol] ? String(rowB[sortCol]).toUpperCase() : "";
     return cellA < cellB ? -1 : cellA > cellB ? 1 : 0;
   });
 
