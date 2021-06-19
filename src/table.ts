@@ -2,15 +2,13 @@ type TableCell = any;
 type TableRow = Array<TableCell>;
 type Table = Array<TableRow>;
 
-type ColumnAlignment = "left" | "right";
-
 interface TableOptions {
   sortCol?: number | null,
   noHeader?: boolean,
-  columnAlign?: Array<ColumnAlignment>
+  columnAlign?: string
 }
 
-const table = (table: Table, {sortCol = 0, noHeader = false, columnAlign = []}: TableOptions = {}): null | string => {
+const table = (table: Table, {sortCol = 0, noHeader = false, columnAlign = ""}: TableOptions = {}): null | string => {
   if (!table || !table.length || !table[0] || !table[0].length) {
     return null;
   }
@@ -44,9 +42,8 @@ const table = (table: Table, {sortCol = 0, noHeader = false, columnAlign = []}: 
         .slice(0, columnCount)
         .map((cell, columnIndex) =>
           (noHeader || columnIndex > 0)
-          && Array.isArray(columnAlign)
           && columnAlign.length > columnIndex
-          && columnAlign[columnIndex] === "right"
+          && columnAlign[columnIndex] === "r"
             ? " ".repeat(columnWidth[columnIndex] - String(cell).length) + cell
             : cell + " ".repeat(columnWidth[columnIndex] - String(cell).length)
         )
