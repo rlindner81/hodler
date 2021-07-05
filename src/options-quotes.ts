@@ -8,6 +8,7 @@ const SYMBOLS = [
   "BARK210820C00025000",
   "CCL220121C00012500",
   "MNMD220121C00005000",
+  "PLTR210521C00040000",
 ];
 
 const getMarketResults = async () => {
@@ -34,9 +35,29 @@ const getHistoricResults = async (date: Date) => {
   return results;
 }
 
+const readArgs = () => {
+  const historyIndex = Deno.args.indexOf("--history");
+  const doHistory = historyIndex !== -1;
+  if (Deno.args.length <= historyIndex + 1) {
+    return {
+      doHistory,
+      historyDate: new Date(Date.UTC(2021, 0, 1)),
+    };
+  }
+
+  const historyDateRaw = Deno.args[historyIndex + 1];
+  const [,year, month, day] = /(\d{4})-(\d{2})-(\d{2})/.exec(historyDateRaw) || [];
+  const historyDate = new Date(Date.UTC(parseInt(year), parseInt(month) - 1, parseInt(day)));
+  return {
+    doHistory,
+    historyDate
+  }
+}
+
 const main = async () => {
-  // const results = await getHistoricResults(new Date(Date.UTC(2021, 0, 1))
-  const results = await getMarketResults();
+  const {doHistory, historyDate} = readArgs();
+  const results = doHistory ? await getHistoricResults(historyDate) : await getMarketResults();
+  console.log("results for %s", doHistory ? historyDate.toString() : new Date().toString());
 
   const headerRow = ["symbol", "bid", "ask", "open", "high", "low", "close"];
   const tableData = [headerRow].concat(
