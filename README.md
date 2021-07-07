@@ -27,3 +27,6 @@ deno install -A -f -n udd https://deno.land/x/udd@0.5.0/main.ts
 
 udd src/**/*.ts
 ```
+
+- 
+- DnDB for persistence https://deno.land/x/dndb@0.2.2
