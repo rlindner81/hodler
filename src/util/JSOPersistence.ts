@@ -1,4 +1,4 @@
-import { exists } from "https://deno.land/std@0.71.0/fs/mod.ts";
+import { exists } from "https://deno.land/std@0.100.0/fs/mod.ts";
 
 /**
 await store.initialize();
@@ -99,7 +99,9 @@ const JSOPersistence = (
     if (records === null) {
       return null;
     }
-    const filteredRecords = where ? records.filter(_filter(where)) : records.slice();
+    const filteredRecords = where
+      ? records.filter(_filter(where))
+      : records.slice();
     return filteredRecords.map((record) => ({ ...record }));
   };
 

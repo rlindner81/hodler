@@ -1,4 +1,4 @@
-import {getMarketQuotes, getMarketHistory} from "./tradier.ts";
+import { getMarketHistory, getMarketQuotes } from "./tradier.ts";
 import table from "./table.ts";
 
 type Stock = Record<"symbol" | "amount", string>;
@@ -12,9 +12,9 @@ const SYMBOLS = [
 ];
 
 const getMarketResults = async () => {
-  const {quotes: {quote: results}} = await getMarketQuotes(SYMBOLS);
+  const { quotes: { quote: results } } = await getMarketQuotes(SYMBOLS);
   return results;
-}
+};
 
 const getHistoricResults = async (date: Date) => {
   const results = [];
@@ -29,11 +29,11 @@ const getHistoricResults = async (date: Date) => {
     const result = day[day.length - 1];
     results.push({
       symbol,
-      ...result
-    })
+      ...result,
+    });
   }
   return results;
-}
+};
 
 const readArgs = () => {
   const historyIndex = Deno.args.indexOf("--history");
@@ -46,37 +46,44 @@ const readArgs = () => {
   }
 
   const historyDateRaw = Deno.args[historyIndex + 1];
-  const [,year, month, day] = /(\d{4})-(\d{2})-(\d{2})/.exec(historyDateRaw) || [];
-  const historyDate = new Date(Date.UTC(parseInt(year), parseInt(month) - 1, parseInt(day)));
+  const [, year, month, day] = /(\d{4})-(\d{2})-(\d{2})/.exec(historyDateRaw) ||
+    [];
+  const historyDate = new Date(
+    Date.UTC(parseInt(year), parseInt(month) - 1, parseInt(day)),
+  );
   return {
     doHistory,
-    historyDate
-  }
-}
+    historyDate,
+  };
+};
 
 const main = async () => {
-  const {doHistory, historyDate} = readArgs();
-  const results = doHistory ? await getHistoricResults(historyDate) : await getMarketResults();
-  console.log("results for %s", doHistory ? historyDate.toString() : new Date().toString());
+  const { doHistory, historyDate } = readArgs();
+  const results = doHistory
+    ? await getHistoricResults(historyDate)
+    : await getMarketResults();
+  console.log(
+    "results for %s",
+    doHistory ? historyDate.toString() : new Date().toString(),
+  );
 
   const headerRow = ["symbol", "bid", "ask", "open", "high", "low", "close"];
   const tableData = [headerRow].concat(
     results.map(
-      ({symbol, bid, ask, open, high, low, close}) =>
-        [
-          symbol,
-          bid ? bid.toFixed(2) : "",
-          ask ? ask.toFixed(2) : "",
-          open ? open.toFixed(2) : "",
-          high ? high.toFixed(2) : "",
-          low ? low.toFixed(2) : "",
-          close ? close.toFixed(2): ""
-        ]
-    )
+      ({ symbol, bid, ask, open, high, low, close }) => [
+        symbol,
+        bid ? bid.toFixed(2) : "",
+        ask ? ask.toFixed(2) : "",
+        open ? open.toFixed(2) : "",
+        high ? high.toFixed(2) : "",
+        low ? low.toFixed(2) : "",
+        close ? close.toFixed(2) : "",
+      ],
+    ),
   );
   console.log(table(tableData, {
     sortCol: null,
-    columnAlign: "lrrrrrr"
+    columnAlign: "lrrrrrr",
   }));
 };
 

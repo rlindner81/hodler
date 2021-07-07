@@ -6,7 +6,10 @@ const SESSION_COOKIE_LIFETIME_SECONDS = 365 * 24 * 3600; // 1 year
 
 export type Session = Record<"userId", number>;
 
-const SessionMiddleware = async (ctx: Context, next: () => Promise<void>) => {
+const SessionMiddleware = async (
+  ctx: Context,
+  next: () => Promise<unknown>,
+) => {
   const userIdInCookie = ctx.cookies.get(SESSION_COOKIE_KEY);
   const userId = userIdInCookie ? parseInt(userIdInCookie) : null;
   ctx.state.session = { ...(userId && { userId }) };

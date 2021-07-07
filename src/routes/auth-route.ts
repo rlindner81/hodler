@@ -1,10 +1,10 @@
 import { Context, Router, RouterOptions, Status } from "../deps.ts";
 import {
+  getMe,
   login,
   logout,
-  getMe,
-  updateMe,
   register,
+  updateMe,
 } from "../services/auth-service.ts";
 import auth from "../middlewares/auth-middleware.ts";
 import validate from "../middlewares/validaton-middleware.ts";

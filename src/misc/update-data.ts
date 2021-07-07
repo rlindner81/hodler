@@ -1,11 +1,12 @@
-import { exists } from "https://deno.land/std@0.97.0/fs/mod.ts";
+import { exists } from "https://deno.land/std@0.100.0/fs/mod.ts";
 import { getMarketHistory } from "./tradier.ts";
 
-type Stock = Record<"symbol"|"amount", string>;
+type Stock = Record<"symbol" | "amount", string>;
 
 const STOCKS_FILE = "data/stocks.json";
 
-const historyDataFileForSymbol = (symbol: string) => `data/history-${symbol}.json`;
+const historyDataFileForSymbol = (symbol: string) =>
+  `data/history-${symbol}.json`;
 
 const loadHistoryDataForSymbol = async (symbol: string) => {
   const file = historyDataFileForSymbol(symbol);
@@ -28,9 +29,9 @@ const loadHistoryDataForSymbols = async (list: Array<Stock>) =>
   Object.fromEntries(
     await Promise.all(
       list.map(
-        async ({ symbol }) => [symbol, await loadHistoryDataForSymbol(symbol)]
-      )
-    )
+        async ({ symbol }) => [symbol, await loadHistoryDataForSymbol(symbol)],
+      ),
+    ),
   );
 
 const loadQuoteDataForSymbols = async (list: Array<Stock>) => {

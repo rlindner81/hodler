@@ -19,3 +19,11 @@ deno run --unstable --allow-all src/server.ts
 - https://stooq.com/db/h/
 
 ## dependencies
+
+- https://github.com/hayd/deno-udd
+
+```
+deno install -A -f -n udd https://deno.land/x/udd@0.5.0/main.ts
+
+udd src/**/*.ts
+```

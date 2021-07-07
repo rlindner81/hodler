@@ -1,9 +1,9 @@
-import { validasaur, Status } from "../deps.ts";
+import { Status, validasaur } from "../deps.ts";
 import type { Context } from "../deps.ts";
 const { validate, firstMessages } = validasaur;
 
 const ValidateMiddleware = (schema: validasaur.ValidationRules) =>
-  async (ctx: Context, next: () => Promise<void>) => {
+  async (ctx: Context, next: () => Promise<unknown>) => {
     ctx.assert(ctx.request.hasBody, Status.UnprocessableEntity);
     const [passes, errors] = await validate(
       await ctx.request.body({ type: "json" }).value,

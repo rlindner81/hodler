@@ -49,13 +49,19 @@ const updateMe = async (ctx: Context) => {
 };
 
 const register = async (ctx: Context) => {
-  const { name, email, password: passwordPlaintext } = await ctx.request.body({ type: "json" })
+  const { name, email, password: passwordPlaintext } = await ctx.request.body({
+    type: "json",
+  })
     .value;
   const emailUsers = store.readFirst(
     "./users",
     { email },
   );
-  ctx.assert(emailUsers === null, Status.UnprocessableEntity, Error.UserAlreadyRegistered);
+  ctx.assert(
+    emailUsers === null,
+    Status.UnprocessableEntity,
+    Error.UserAlreadyRegistered,
+  );
   const password = await bcrypt.hash(passwordPlaintext);
   const newUser = store.create(
     "./users",
@@ -67,4 +73,4 @@ const register = async (ctx: Context) => {
   return newUser;
 };
 
-export { isLoggedIn, login, logout, getMe, updateMe, register };
+export { getMe, isLoggedIn, login, logout, register, updateMe };

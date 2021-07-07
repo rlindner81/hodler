@@ -33,7 +33,7 @@
         "run",
         "--unstable",
         "--allow-all",
-        "--inspect-brk=127.0.0.1:9229",
+        "--inspect-brk=127.0.0.1:9229"
       ],
       "outputCapture": "std",
       "attachSimplePort": 9229
