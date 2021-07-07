@@ -10,7 +10,6 @@ if (name !== null) {
   const changedNames = store.read("./users", { id: name.id });
   const deleteCount = store.delete("./users", { id: name.id });
   const noNames = store.read("./users", { id: name.id });
-  const i = 0;
 }
 */
 
