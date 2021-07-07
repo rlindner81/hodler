@@ -7,10 +7,15 @@
   - https://deno.land/x
 
 ```
-// install
-deno cache --unstable --reload src/update-data.ts 
-// run
-deno run --unstable src/update-data.ts
+# install
+deno cache --unstable --reload src/server.ts
+
+# run
+deno run --unstable --allow-all src/server.ts
 ```
+
+## data source
+
+- https://stooq.com/db/h/
 
 ## dependencies

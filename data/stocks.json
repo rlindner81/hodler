@@ -1,7 +1,7 @@
 [
   {
     "symbol": "BARK",
-    "amount": 830
+    "amount": 1100
   },
   {
     "symbol": "CRSR",
@@ -26,5 +26,6 @@
   { "symbol": "PLTR", "amount": 1000 },
   { "symbol": "TWTR", "amount": 360 },
   { "symbol": "AMD", "amount": 320 },
-  { "symbol": "DIS", "amount": 200 }
+  { "symbol": "DIS", "amount": 200 },
+  { "symbol": "7CD.F", "amount": 400 }
 ]
