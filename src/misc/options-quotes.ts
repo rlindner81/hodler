@@ -1,12 +1,64 @@
-import {getMarketQuotes} from "./tradier.ts";
+import {getMarketQuotes, getMarketHistory} from "./tradier.ts";
 import table from "./table.ts";
 
 type Stock = Record<"symbol" | "amount", string>;
 
-const SYMBOLS = ["MNMD220121C00005000", "BARK210820C00025000", "AMD220121C00077500"];
+const SYMBOLS = [
+  "AMD220121C00077500",
+  "BARK210820C00025000",
+  "CCL220121C00012500",
+  "MNMD220121C00005000",
+  "PLTR210521C00040000",
+];
+
+const getMarketResults = async () => {
+  const {quotes: {quote: results}} = await getMarketQuotes(SYMBOLS);
+  return results;
+}
+
+const getHistoricResults = async (date: Date) => {
+  const results = [];
+  for (const symbol of SYMBOLS) {
+    const startDate = new Date(date);
+    startDate.setDate(startDate.getDate() - 10);
+    const { history } = await getMarketHistory(symbol, startDate, date);
+    if (history === null) {
+      continue;
+    }
+    const { day } = history;
+    const result = day[day.length - 1];
+    results.push({
+      symbol,
+      ...result
+    })
+  }
+  return results;
+}
+
+const readArgs = () => {
+  const historyIndex = Deno.args.indexOf("--history");
+  const doHistory = historyIndex !== -1;
+  if (Deno.args.length <= historyIndex + 1) {
+    return {
+      doHistory,
+      historyDate: new Date(Date.UTC(2021, 0, 1)),
+    };
+  }
+
+  const historyDateRaw = Deno.args[historyIndex + 1];
+  const [,year, month, day] = /(\d{4})-(\d{2})-(\d{2})/.exec(historyDateRaw) || [];
+  const historyDate = new Date(Date.UTC(parseInt(year), parseInt(month) - 1, parseInt(day)));
+  return {
+    doHistory,
+    historyDate
+  }
+}
 
 const main = async () => {
-  const {quotes: {quote: results}} = await getMarketQuotes(SYMBOLS);
+  const {doHistory, historyDate} = readArgs();
+  const results = doHistory ? await getHistoricResults(historyDate) : await getMarketResults();
+  console.log("results for %s", doHistory ? historyDate.toString() : new Date().toString());
+
   const headerRow = ["symbol", "bid", "ask", "open", "high", "low", "close"];
   const tableData = [headerRow].concat(
     results.map(

@@ -24,6 +24,10 @@
       "request": "launch",
       "program": "${workspaceFolder}/src/options-quotes.ts",
       "cwd": "${workspaceFolder}",
+      "args": [
+        "--history",
+        "2021-04-04"
+      ],
       "runtimeExecutable": "deno",
       "runtimeArgs": [
         "run",

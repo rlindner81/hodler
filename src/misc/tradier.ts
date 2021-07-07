@@ -26,10 +26,9 @@ const _getToken = () => {
   return tradierToken;
 }
 
-const getMarketHistory = async (symbol: string) => {
-  const nowDate = new Date();
-  const start = `${nowDate.getFullYear()}-01-01`;
-  const end = nowDate.toISOString().slice(0, 10);
+const getMarketHistory = async (symbol: string, startDate:Date = new Date(Date.UTC(new Date().getFullYear(), 0, 1)), endDate:Date = new Date()) => {
+  const start = startDate.toISOString().slice(0, 10);
+  const end = endDate.toISOString().slice(0, 10);
   const tradierUrl = new URL("/v1/markets/history", TRADIER_HOST);
   tradierUrl.search = new URLSearchParams({
     symbol,
@@ -40,6 +39,7 @@ const getMarketHistory = async (symbol: string) => {
     "Accept": "application/json",
     "Authorization": `Bearer ${_getToken()}`,
   };
+  // console.log(tradierUrl.toString());
   const reponse = await fetch(tradierUrl.toString(), {headers});
   return reponse.json();
 };
