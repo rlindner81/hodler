@@ -1,1 +1,10 @@
-{}
+{
+  "./users": [
+    {
+      "name": "Richard",
+      "email": "rlindner81@gmail.com",
+      "password": "$2a$10$KZk57UgBYqCiozCCnEhGWu9hU38pYa6H9S2f0FnABbFN.tVdXZUWe",
+      "id": 1
+    }
+  ]
+}
