@@ -1,4 +1,4 @@
-const TRADIER_APIKEY_ENV_VAR = "TRADIER_APIKEY";
+const API_KEY = Deno.env.get("TRADIER_APIKEY");
 const TRADIER_HOST = new URL("https://sandbox.tradier.com/");
 
 // TODO wrap fetch with some error handling...
@@ -17,15 +17,12 @@ type Quotes = Record<"quotes", Record<"quote", Array<Quote>>>;
 let tradierToken: string | undefined = undefined;
 
 const _getToken = () => {
-  if (tradierToken === undefined) {
-    tradierToken = Deno.env.get(TRADIER_APIKEY_ENV_VAR);
-    if (tradierToken === undefined) {
-      throw new Error(
-        `cannot find tradier api key in env var ${TRADIER_APIKEY_ENV_VAR}`,
-      );
-    }
+  if (API_KEY === undefined) {
+    throw new Error(
+      `cannot find tradier api key in env var ${API_KEY}`,
+    );
   }
-  return tradierToken;
+  return API_KEY;
 };
 
 const getMarketHistory = async (

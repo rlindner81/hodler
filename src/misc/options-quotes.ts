@@ -1,4 +1,4 @@
-import { getMarketHistory, getMarketQuotes } from "./tradier.ts";
+import { getMarketHistory, getMarketQuotes } from "../util/tradier.ts";
 import table from "./table.ts";
 
 type Stock = Record<"symbol" | "amount", string>;
