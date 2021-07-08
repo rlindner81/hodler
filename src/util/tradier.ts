@@ -48,7 +48,9 @@ const getMarketHistory = async (
   return reponse.json();
 };
 
-const getMarketQuotes = async (symbols: Array<string>): Promise<ResponseQuote | ResponseQuotes> => {
+const getMarketQuotes = async (
+  symbols: Array<string>,
+): Promise<ResponseQuote | ResponseQuotes> => {
   const tradierUrl = new URL("/v1/markets/quotes", TRADIER_HOST);
   tradierUrl.search = new URLSearchParams({ symbols: symbols.join(",") })
     .toString();

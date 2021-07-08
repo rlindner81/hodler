@@ -10,4 +10,4 @@ const historicQuoteSchema = {
   date: [required, isString, lengthBetween(10, 10), isDate],
 };
 
-export { liveQuoteSchema, historicQuoteSchema };
+export { historicQuoteSchema, liveQuoteSchema };
