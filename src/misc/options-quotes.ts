@@ -1,8 +1,6 @@
 import { getMarketHistory, getMarketQuotes } from "../util/tradier.ts";
 import table from "./table.ts";
 
-type Stock = Record<"symbol" | "amount", string>;
-
 const SYMBOLS = [
   "AMD220121C00077500",
   "BARK210820C00025000",
@@ -66,6 +64,9 @@ const main = async () => {
     "results for %s",
     doHistory ? historyDate.toString() : new Date().toString(),
   );
+  if (!Array.isArray(results)) {
+    return;
+  }
 
   const headerRow = ["symbol", "bid", "ask", "open", "high", "low", "close"];
   const tableData = [headerRow].concat(
