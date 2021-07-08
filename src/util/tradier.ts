@@ -11,10 +11,12 @@ interface Quote {
   high: number;
   low: number;
   close: number;
+  last: number;
 }
 
-type Quotes = Record<"quotes", Record<"quote", Array<Quote>>>;
-let tradierToken: string | undefined = undefined;
+type ResponseQuotes = Record<"quotes", Record<"quote", Array<Quote>>>;
+type ResponseQuote = Record<"quotes", Record<"quote", Quote>>;
+let tradierToken: string | undefined;
 
 const _getToken = () => {
   if (API_KEY === undefined) {
@@ -42,12 +44,11 @@ const getMarketHistory = async (
     "Accept": "application/json",
     "Authorization": `Bearer ${_getToken()}`,
   };
-  // console.log(tradierUrl.toString());
   const reponse = await fetch(tradierUrl.toString(), { headers });
   return reponse.json();
 };
 
-const getMarketQuotes = async (symbols: Array<string>): Promise<Quotes> => {
+const getMarketQuotes = async (symbols: Array<string>): Promise<ResponseQuote | ResponseQuotes> => {
   const tradierUrl = new URL("/v1/markets/quotes", TRADIER_HOST);
   tradierUrl.search = new URLSearchParams({ symbols: symbols.join(",") })
     .toString();
