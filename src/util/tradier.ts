@@ -29,11 +29,15 @@ const _getToken = () => {
 
 const getMarketHistory = async (
   symbol: string,
-  startDate: Date = new Date(Date.UTC(new Date().getFullYear(), 0, 1)),
-  endDate: Date = new Date(),
+  startDate: string | Date = new Date(Date.UTC(new Date().getFullYear(), 0, 1)),
+  endDate: string | Date = new Date(),
 ) => {
-  const start = startDate.toISOString().slice(0, 10);
-  const end = endDate.toISOString().slice(0, 10);
+  const start = startDate instanceof Date
+    ? startDate.toISOString().slice(0, 10)
+    : startDate;
+  const end =  endDate instanceof Date
+    ? endDate.toISOString().slice(0, 10)
+    : endDate;
   const tradierUrl = new URL("/v1/markets/history", TRADIER_HOST);
   tradierUrl.search = new URLSearchParams({
     symbol,
