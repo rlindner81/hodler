@@ -3,15 +3,21 @@ import store from "./store.ts";
 import RootRouter from "./routes/root-route.ts";
 import QuoteRouter from "./routes/quote-route.ts";
 
-const envCookieKey = Deno.env.get("COOKIE_KEY");
 const envPort = Deno.env.get("PORT");
-const proxy = /^t(?:rue)?$/.test(Deno.env.get("PROXY") ?? "");
-const appOptions = {
-  ...(proxy && { proxy }),
-  ...(envCookieKey && { keys: [envCookieKey] }),
-};
 
-const app = new Application(appOptions);
+const newApp = () => {
+  const cookieKey = Deno.env.get("COOKIE_KEY");
+  const proxy = /^t(?:rue)?$/.test(Deno.env.get("PROXY") ?? "");
+  const appOptions = {
+    ...(proxy && { proxy }),
+    ...(cookieKey && { keys: [cookieKey] }),
+  };
+
+  console.log("server config .proxy %s, .cookieKey %s", proxy, cookieKey?.replace(/./g, "*") ?? "");
+  return new Application(appOptions);
+}
+
+const app = newApp();
 const port = envPort ? parseInt(envPort) : 8080;
 
 await store.initialize();
