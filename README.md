@@ -23,9 +23,15 @@ deno run --unstable --allow-all src/server.ts
 - https://github.com/hayd/deno-udd
 
 ```
+# update setup
 deno install -A -f -n udd https://deno.land/x/udd@0.5.0/main.ts
 
+# update dependencies
 udd src/**/*.ts
+deno cache --unstable --reload src/server.ts
+
+# format files
+deno fmt src/**/*.ts 
 ```
 
 - 

@@ -35,7 +35,7 @@ const getMarketHistory = async (
   const start = startDate instanceof Date
     ? startDate.toISOString().slice(0, 10)
     : startDate;
-  const end =  endDate instanceof Date
+  const end = endDate instanceof Date
     ? endDate.toISOString().slice(0, 10)
     : endDate;
   const tradierUrl = new URL("/v1/markets/history", TRADIER_HOST);

@@ -1,4 +1,4 @@
-import { exists } from "https://deno.land/std@0.100.0/fs/mod.ts";
+import { exists } from "https://deno.land/std@0.101.0/fs/mod.ts";
 
 /**
 await store.initialize();

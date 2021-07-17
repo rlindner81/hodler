@@ -57,7 +57,7 @@ const getLiveQuotes = async (ctx: Context) => {
 const _getHistoricPrice = async (input: string) => {
   const [date, symbol] = input.split("##");
   const [, year, month, day] = /(\d{4})-(\d{2})-(\d{2})/.exec(date) ||
-  [];
+    [];
   const endDate = new Date(
     Date.UTC(parseInt(year), parseInt(month) - 1, parseInt(day)),
   );
