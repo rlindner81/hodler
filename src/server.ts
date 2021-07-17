@@ -5,7 +5,11 @@ import QuoteRouter from "./routes/quote-route.ts";
 
 const envCookieKey = Deno.env.get("COOKIE_KEY");
 const envPort = Deno.env.get("PORT");
-const appOptions = envCookieKey ? { keys: [envCookieKey] } : {};
+const proxy = /^t(?:rue)?$/.test(Deno.env.get("PROXY") ?? "");
+const appOptions = {
+  ...(proxy && { proxy }),
+  ...(envCookieKey && { keys: [envCookieKey] })
+};
 
 const app = new Application(appOptions);
 const port = envPort ? parseInt(envPort) : 8080;
