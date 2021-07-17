@@ -5,7 +5,7 @@ const TIMEOUT_LIVE_CACHE = 60 * 1000; // 1 min
 const TIMEOUT_HISTORIC_CACHE = 604800 * 1000; // 1 week
 const HISTORIC_DAY_SCAN_GAP = 10;
 
-type Cache = Record<string, number>;
+type Cache = Record<string, number | null>;
 
 const liveQuoteCache: Cache = {};
 const historicQuoteCache: Cache = {};
@@ -19,11 +19,7 @@ const readWriteCache = async (
   if (Object.prototype.hasOwnProperty.call(cache, key)) {
     return cache[key];
   }
-  const value = await callback(key);
-  if (value === null) {
-    return null;
-  }
-  cache[key] = value;
+  cache[key] = await callback(key);
   setTimeout(() => {
     Reflect.deleteProperty(cache, key);
   }, timeout);
@@ -58,7 +54,6 @@ const getLiveQuotes = async (ctx: Context) => {
   );
 };
 
-// TODO with this style new symbols will always bypass cache and cause unwanted webtraffic
 const _getHistoricPrice = async (input: string) => {
   const [date, symbol] = input.split("##");
   const [, year, month, day] = /(\d{4})-(\d{2})-(\d{2})/.exec(date) ||
