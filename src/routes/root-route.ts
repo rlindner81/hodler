@@ -10,20 +10,9 @@ import {
 export default (options?: RouterOptions) => {
   const router: Router = new Router(options);
 
-  router.post("/live", auth, validate(liveQuoteSchema), async (ctx: Context) => {
-    const quotes = await getLiveQuotes(ctx);
-    ctx.response.body = quotes;
+  router.get("/", async (ctx: Context) => {
+    ctx.response.body = "You reached hodler server... hold on for dear live";
   });
-
-  router.post(
-    "/historic",
-    auth,
-    validate(historicQuoteSchema),
-    async (ctx: Context) => {
-      const quotes = await getHistoricQuotes(ctx);
-      ctx.response.body = quotes;
-    },
-  );
 
   return router;
 };

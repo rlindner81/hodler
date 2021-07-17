@@ -1,5 +1,6 @@
 import { Application } from "./deps.ts";
 import store from "./store.ts";
+import RootRouter from "./routes/root-route.ts";
 import QuoteRouter from "./routes/quote-route.ts";
 
 const envCookieKey = Deno.env.get("COOKIE_KEY");
@@ -20,6 +21,10 @@ app.use(async (ctx, next) => {
     ctx.response.body = err.message;
   }
 });
+
+const rootRouter = RootRouter({ prefix: "/" });
+app.use(rootRouter.allowedMethods());
+app.use(rootRouter.routes());
 
 const quoteRouter = QuoteRouter({ prefix: "/api/quote" });
 app.use(quoteRouter.allowedMethods());
