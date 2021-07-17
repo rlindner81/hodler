@@ -8,7 +8,7 @@ const envPort = Deno.env.get("PORT");
 const proxy = /^t(?:rue)?$/.test(Deno.env.get("PROXY") ?? "");
 const appOptions = {
   ...(proxy && { proxy }),
-  ...(envCookieKey && { keys: [envCookieKey] })
+  ...(envCookieKey && { keys: [envCookieKey] }),
 };
 
 const app = new Application(appOptions);

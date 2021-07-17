@@ -10,10 +10,15 @@ import {
 export default (options?: RouterOptions) => {
   const router: Router = new Router(options);
 
-  router.post("/live", auth, validate(liveQuoteSchema), async (ctx: Context) => {
-    const quotes = await getLiveQuotes(ctx);
-    ctx.response.body = quotes;
-  });
+  router.post(
+    "/live",
+    auth,
+    validate(liveQuoteSchema),
+    async (ctx: Context) => {
+      const quotes = await getLiveQuotes(ctx);
+      ctx.response.body = quotes;
+    },
+  );
 
   router.post(
     "/historic",
