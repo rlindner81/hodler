@@ -13,7 +13,8 @@ const newApp = () => {
     ...(cookieKey && { keys: [cookieKey] }),
   };
 
-  console.log("server config .proxy %s, .cookieKey %s", proxy, cookieKey?.replace(/./g, "*") ?? "");
+  proxy && console.log("server config .proxy %s", proxy);
+  cookieKey && console.log("server config .cookieKey %s", cookieKey.replace(/./g, "*"));
   return new Application(appOptions);
 }
 
