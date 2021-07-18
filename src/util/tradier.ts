@@ -2,7 +2,7 @@ import config from "../config.ts";
 
 const TRADIER_HOST = new URL("https://sandbox.tradier.com/");
 
-const { hodlerKey } = config;
+const { tradierKey } = config;
 
 // TODO wrap fetch with some error handling...
 
@@ -22,12 +22,12 @@ type ResponseQuote = Record<"quotes", Record<"quote", Quote>>;
 let tradierToken: string | undefined;
 
 const _getToken = () => {
-  if (hodlerKey === undefined) {
+  if (tradierKey === undefined) {
     throw new Error(
-      `cannot find tradier api key in env var ${hodlerKey}`,
+      `cannot find tradier api key in env var ${tradierKey}`,
     );
   }
-  return hodlerKey;
+  return tradierKey;
 };
 
 const getMarketHistory = async (
