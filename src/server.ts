@@ -1,25 +1,16 @@
 import { Application, Context } from "./deps.ts";
 import store from "./store.ts";
+import { default as config, logConfig } from "./config.ts";
 import RootRouter from "./routes/root-route.ts";
 import QuoteRouter from "./routes/quote-route.ts";
 
-const envPort = Deno.env.get("PORT");
+logConfig();
+const { port, proxy, cookieKey } = config;
 
-const newApp = () => {
-  const cookieKey = Deno.env.get("COOKIE_KEY");
-  const proxy = /^t(?:rue)?$/.test(Deno.env.get("PROXY") ?? "");
-  const appOptions = {
-    ...(proxy && { proxy }),
-    ...(cookieKey && { keys: [cookieKey] }),
-  };
-
-  proxy && console.log("server config .proxy %s", proxy);
-  cookieKey && console.log("server config .cookieKey %s", cookieKey.replace(/./g, "*"));
-  return new Application(appOptions);
-}
-
-const app = newApp();
-const port = envPort ? parseInt(envPort) : 8080;
+const app = new Application({
+  proxy,
+  ...(cookieKey && { keys: [cookieKey] }),
+});
 
 await store.initialize();
 

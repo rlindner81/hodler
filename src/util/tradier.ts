@@ -1,5 +1,8 @@
-const API_KEY = Deno.env.get("TRADIER_APIKEY");
+import config from "../config.ts";
+
 const TRADIER_HOST = new URL("https://sandbox.tradier.com/");
+
+const { hodlerKey } = config;
 
 // TODO wrap fetch with some error handling...
 
@@ -19,12 +22,12 @@ type ResponseQuote = Record<"quotes", Record<"quote", Quote>>;
 let tradierToken: string | undefined;
 
 const _getToken = () => {
-  if (API_KEY === undefined) {
+  if (hodlerKey === undefined) {
     throw new Error(
-      `cannot find tradier api key in env var ${API_KEY}`,
+      `cannot find tradier api key in env var ${hodlerKey}`,
     );
   }
-  return API_KEY;
+  return hodlerKey;
 };
 
 const getMarketHistory = async (
