@@ -1,4 +1,4 @@
-import { Context, Status } from "../deps.ts";
+import { Context } from "../deps.ts";
 import { getMarketHistory, getMarketQuotes } from "../util/tradier.ts";
 
 const TIMEOUT_LIVE_CACHE = 60 * 1000; // 1 min

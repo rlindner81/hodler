@@ -29,7 +29,7 @@ app.use(async (ctx: Context, next: () => Promise<unknown>) => {
   } catch (err) {
     console.error(err);
     ctx.response.status = err.status;
-    ctx.response.body = err.message;
+    ctx.response.body = err.message + "\n";
   }
 });
 
