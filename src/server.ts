@@ -1,4 +1,4 @@
-import { Application } from "./deps.ts";
+import { Application, Context } from "./deps.ts";
 import store from "./store.ts";
 import RootRouter from "./routes/root-route.ts";
 import QuoteRouter from "./routes/quote-route.ts";
@@ -23,7 +23,7 @@ const port = envPort ? parseInt(envPort) : 8080;
 
 await store.initialize();
 
-app.use(async (ctx, next) => {
+app.use(async (ctx: Context, next: () => Promise<unknown>) => {
   try {
     await next();
   } catch (err) {
