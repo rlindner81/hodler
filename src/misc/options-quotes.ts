@@ -2,11 +2,11 @@ import { getMarketHistory, getMarketQuotes } from "../util/tradier.ts";
 import table from "./table.ts";
 
 const SYMBOLS = [
-  "AMD220121C00077500",
+  // "AMD220121C00077500",
   "BARK210820C00025000",
-  "CCL220121C00012500",
+  // "CCL220121C00012500",
   "MNMD220121C00005000",
-  "PLTR210521C00040000",
+  // "PLTR210521C00040000",
 ];
 
 const getMarketResults = async () => {

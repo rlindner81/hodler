@@ -1,0 +1,9 @@
+Timestamp,[Broker],AssetType,Purpose,Amount,Price,[Price Currency]
+x  ,DEGIRO  ,CASH   ,LOAD             ,1   ,1000  ,EUR  ,
+x  ,DEGIRO  ,CASH   ,TRANSACTIONCOST  ,1   ,-2    ,EUR  ,link to stock transaction
+x  ,DEGIRO  ,CASH   ,STOCKBUY         ,1   ,-900  ,EUR  ,link to stock transaction
+
+
+
+x  ,DEGIRO  ,STOCK  ,BUY              ,10  ,100    ,USD  ,link to security, FX Rate???
+x  ,DEGIRO  ,STOCK  ,SELL             ,-10 ,110    ,USD  ,link to security, FX Rate???

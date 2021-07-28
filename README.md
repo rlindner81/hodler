@@ -10,8 +10,11 @@
 # install
 deno cache --unstable --reload src/server.ts
 
-# run
+# run server
 deno run --unstable --allow-all src/server.ts
+
+#  run options-quotes
+deno run --unstable --allow-all src/misc/options-quotes.ts
 ```
 
 ## data source
