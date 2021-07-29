@@ -103,7 +103,8 @@ VALUES ('CASH_LOAD'),
        ('STOCK_BUY'),
        ('STOCK_SELL'),
        ('OPTION_BUY'),
-       ('OPTION_SELL')
+       ('OPTION_SELL'),
+       ('TRANSACTION_COST')
 ;
 
 CREATE TABLE IF NOT EXISTS t_cash_transaction
