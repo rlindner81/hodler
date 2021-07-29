@@ -8,10 +8,14 @@ DROP TABLE IF EXISTS t_security_transaction CASCADE;
 DROP TABLE IF EXISTS t_cash_transaction_type CASCADE;
 DROP TABLE IF EXISTS t_cash_transaction CASCADE;
 
+CREATE DOMAIN d_short_text AS VARCHAR(256);
+CREATE DOMAIN d_money AS NUMERIC(20, 10);
+CREATE DOMAIN d_currency AS VARCHAR(3);
+
 CREATE TABLE IF NOT EXISTS t_user
 (
-    identifier VARCHAR(256) PRIMARY KEY NOT NULL,
-    name       VARCHAR(256)             NOT NULL
+    identifier d_short_text PRIMARY KEY NOT NULL,
+    name       d_short_text             NOT NULL
 );
 INSERT INTO t_user (identifier, name)
 VALUES ('rlindner81@gmail.com', 'Richard')
@@ -19,8 +23,8 @@ VALUES ('rlindner81@gmail.com', 'Richard')
 
 CREATE TABLE IF NOT EXISTS t_currency
 (
-    identifier VARCHAR(3) PRIMARY KEY NOT NULL,
-    name       VARCHAR(256)           NOT NULL
+    identifier d_currency PRIMARY KEY NOT NULL,
+    name       d_short_text           NOT NULL
 );
 INSERT INTO t_currency (identifier, name)
 VALUES ('EUR', 'Euro'),
@@ -29,8 +33,8 @@ VALUES ('EUR', 'Euro'),
 
 CREATE TABLE IF NOT EXISTS t_broker
 (
-    identifier VARCHAR(256) PRIMARY KEY NOT NULL,
-    name       VARCHAR(256)             NOT NULL
+    identifier d_short_text PRIMARY KEY NOT NULL,
+    name       d_short_text             NOT NULL
 );
 INSERT INTO t_broker (identifier, name)
 VALUES ('DEGIRO', 'Degiro'),
@@ -39,7 +43,7 @@ VALUES ('DEGIRO', 'Degiro'),
 
 CREATE TABLE IF NOT EXISTS t_security_type
 (
-    identifier VARCHAR(256) PRIMARY KEY NOT NULL
+    identifier d_short_text PRIMARY KEY NOT NULL
 );
 INSERT INTO t_security_type (identifier)
 VALUES ('STOCK'),
@@ -48,11 +52,11 @@ VALUES ('STOCK'),
 
 CREATE TABLE IF NOT EXISTS t_security
 (
-    identifier VARCHAR(256) PRIMARY KEY                             NOT NULL,
-    isin       VARCHAR(256),
-    currency   VARCHAR(256) REFERENCES t_currency (identifier)      NOT NULL,
-    type       VARCHAR(256) REFERENCES t_security_type (identifier) NOT NULL,
-    underlying VARCHAR(256) REFERENCES t_security (identifier)      NOT NULL
+    identifier d_short_text PRIMARY KEY                             NOT NULL,
+    isin       d_short_text,
+    currency   d_currency REFERENCES t_currency (identifier)        NOT NULL,
+    type       d_short_text REFERENCES t_security_type (identifier) NOT NULL,
+    underlying d_short_text REFERENCES t_security (identifier)      NOT NULL
 );
 INSERT INTO t_security (identifier, currency, type, underlying)
 VALUES ('AMD', 'USD', 'STOCK', 'AMD'),
@@ -61,7 +65,7 @@ VALUES ('AMD', 'USD', 'STOCK', 'AMD'),
 
 CREATE TABLE IF NOT EXISTS t_security_transaction_type
 (
-    identifier VARCHAR(256) PRIMARY KEY NOT NULL
+    identifier d_short_text PRIMARY KEY NOT NULL
 );
 INSERT INTO t_security_transaction_type (identifier)
 VALUES ('STOCK_BUY'),
@@ -73,19 +77,19 @@ CREATE TABLE IF NOT EXISTS t_security_transaction
 (
     id            UUID PRIMARY KEY                                                 NOT NULL,
     timestamp     TIMESTAMP WITHOUT TIME ZONE                                      NOT NULL,
-    broker        VARCHAR(256) REFERENCES t_broker (identifier)                    NOT NULL,
-    "user"        VARCHAR(256) REFERENCES t_user (identifier)                      NOT NULL,
-    type          VARCHAR(256) REFERENCES t_security_transaction_type (identifier) NOT NULL,
+    broker        d_short_text REFERENCES t_broker (identifier)                    NOT NULL,
+    "user"        d_short_text REFERENCES t_user (identifier)                      NOT NULL,
+    type          d_short_text REFERENCES t_security_transaction_type (identifier) NOT NULL,
     amount        INTEGER                                                          NOT NULL,
-    price         NUMERIC(20, 10)                                                  NOT NULL,
-    book_currency VARCHAR(256) REFERENCES t_currency (identifier)                  NOT NULL,
-    book_fx_rate  NUMERIC(20, 10)                                                  NOT NULL
+    price         d_money                                                          NOT NULL,
+    book_currency d_currency REFERENCES t_currency (identifier)                    NOT NULL,
+    book_fx_rate  d_money                                                          NOT NULL
 );
 
 
 CREATE TABLE IF NOT EXISTS t_cash_transaction_type
 (
-    identifier VARCHAR(256) PRIMARY KEY NOT NULL
+    identifier d_short_text PRIMARY KEY NOT NULL
 );
 INSERT INTO t_cash_transaction_type (identifier)
 VALUES ('CASH_LOAD'),
@@ -102,9 +106,9 @@ CREATE TABLE IF NOT EXISTS t_cash_transaction
 (
     id                   UUID PRIMARY KEY                                             NOT NULL,
     timestamp            TIMESTAMP WITHOUT TIME ZONE                                  NOT NULL,
-    broker               VARCHAR(256) REFERENCES t_broker (identifier)                NOT NULL,
-    "user"               VARCHAR(256) REFERENCES t_user (identifier)                  NOT NULL,
-    type                 VARCHAR(256) REFERENCES t_cash_transaction_type (identifier) NOT NULL,
-    price                NUMERIC(20, 10)                                              NOT NULL,
+    broker               d_short_text REFERENCES t_broker (identifier)                NOT NULL,
+    "user"               d_short_text REFERENCES t_user (identifier)                  NOT NULL,
+    type                 d_short_text REFERENCES t_cash_transaction_type (identifier) NOT NULL,
+    price                d_money                                                      NOT NULL,
     security_transaction UUID REFERENCES t_security_transaction (id)
 );
