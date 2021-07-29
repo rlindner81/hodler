@@ -13,7 +13,7 @@ DROP DOMAIN IF EXISTS d_money CASCADE;
 DROP DOMAIN IF EXISTS d_currency CASCADE;
 
 CREATE DOMAIN d_short_text AS VARCHAR(256);
-CREATE DOMAIN d_money AS NUMERIC(20, 10);
+CREATE DOMAIN d_money AS NUMERIC(20, 5);
 CREATE DOMAIN d_currency AS VARCHAR(3);
 
 CREATE TABLE IF NOT EXISTS t_user
@@ -115,5 +115,6 @@ CREATE TABLE IF NOT EXISTS t_cash_transaction
     "user"               d_short_text REFERENCES t_user (identifier)                  NOT NULL,
     type                 d_short_text REFERENCES t_cash_transaction_type (identifier) NOT NULL,
     price                d_money                                                      NOT NULL,
+    currency             d_currency REFERENCES t_currency (identifier)                NOT NULL,
     security_transaction UUID REFERENCES t_security_transaction (id)
 );
