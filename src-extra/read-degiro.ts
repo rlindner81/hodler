@@ -3,13 +3,13 @@ import {
 } from "https://deno.land/std@0.103.0/encoding/csv.ts";
 import table from "./table.ts";
 
-const readCsvData = async (files: string[], doFix = false) => {
+const readCsvData = async (files: string[], doAccountDataFix = false) => {
   const result = (<string[][]>[]).concat(
     ...await Promise.all(
       files.map(async (file) => {
         const inputData = await Deno.readTextFile(file);
         // ,,,S...,,,,,,,,8ec0-5d687df53bc2
-        const fixedInputData = doFix ? inputData.replace(/\n,,,[^,]*,,,,,,,,/g, "") : inputData;
+        const fixedInputData = doAccountDataFix ? inputData.replace(/\n,,,[^,]*,,,,,,,,/g, "") : inputData;
         return (<string[]>await parseCsv(fixedInputData)).slice(1).reverse();
       }),
     ),
@@ -25,17 +25,17 @@ const readCsvData = async (files: string[], doFix = false) => {
 };
 
 const accountFiles = [
-  "temp/degiro-bookings-2017-Account.csv",
-  "temp/degiro-bookings-2018-Account.csv",
-  "temp/degiro-bookings-2019-Account.csv",
-  "temp/degiro-bookings-2020-Account.csv",
-  "temp/degiro-bookings-2021-ongoing-Account.csv",
+  "temp/raw/degiro-bookings-2017-Account.csv",
+  "temp/raw/degiro-bookings-2018-Account.csv",
+  "temp/raw/degiro-bookings-2019-Account.csv",
+  "temp/raw/degiro-bookings-2020-Account.csv",
+  "temp/raw/degiro-bookings-2021-ongoing-Account.csv",
 ];
 
 const transactionFiles = [
-  "temp/degiro-Transactions-2017.csv",
-  "temp/degiro-Transactions-2020.csv",
-  "temp/degiro-Transactions-2021-ongoing.csv",
+  "temp/raw/degiro-Transactions-2017.csv",
+  "temp/raw/degiro-Transactions-2020.csv",
+  "temp/raw/degiro-Transactions-2021-ongoing.csv",
 ];
 
 const accountDataRaw = await readCsvData(accountFiles, true);
@@ -53,19 +53,6 @@ const checkCurrency = (currencies: string[], whitelist: string[]) => {
 };
 
 const processAccountData = (data: string[][]) => {
-  const descriptions = new Set();
-
-  const descriptionTypes = [
-    "Kauf",
-    "Verkauf",
-    "Geldmarktfonds Umwandlung: Kauf",
-    "Geldmarktfonds Umwandlung: Verkauf",
-    "Überweisung auf Ihr Geldkonto bei der flatex Bank",
-    "Auszahlung von Ihrem Geldkonto bei der flatex Bank",
-    "ISIN-ÄNDERUNG",
-    "Einrichtung von Handelsmodalitäten",
-  ];
-
   // Datum,Uhrze,Valutadatum,Produkt,ISIN,Beschreibung,FX,Änderung,,Saldo,,Order-ID
   return data.map(
     (
@@ -75,7 +62,7 @@ const processAccountData = (data: string[][]) => {
         valuaDate,
         product,
         isin,
-        descriptionRaw,
+        description,
         fx,
         changeCurrency,
         changeRaw,
@@ -101,11 +88,6 @@ const processAccountData = (data: string[][]) => {
       }
       const change = changeRaw ? parseFloat(changeRaw.replace(",", ".")) : null;
       const total = totalRaw ? parseFloat(totalRaw.replace(",", ".")) : null;
-      const [, description] =
-      new RegExp(`^(${descriptionTypes.join("|")}|.*).*?$`).exec(
-        descriptionRaw,
-      ) ?? [];
-      descriptions.add(description);
 
       checkCurrency([changeCurrency, totalCurrency], ["PLN", "USD", "EUR"]);
       return {
@@ -203,8 +185,34 @@ const processTransactionData = (data: string[][]) => {
   );
 };
 
+const getDescriptionClusters = (data: any[]) => {
+  const descriptions = new Set();
+
+  const descriptionTypes = [
+    "Kauf",
+    "Verkauf",
+    "Geldmarktfonds Umwandlung: Kauf",
+    "Geldmarktfonds Umwandlung: Verkauf",
+    "Überweisung auf Ihr Geldkonto bei der flatex Bank",
+    "Auszahlung von Ihrem Geldkonto bei der flatex Bank",
+    "ISIN-ÄNDERUNG",
+    "Einrichtung von Handelsmodalitäten",
+  ];
+
+  for (const entry of data) {
+    const [, description] =
+    new RegExp(`^(${descriptionTypes.join("|")}|.*).*?$`).exec(
+      entry.description,
+    ) ?? [];
+    descriptions.add(description);
+  }
+  return descriptions;
+}
+
 const accountData = processAccountData(accountDataRaw);
 const transactionData = processTransactionData(transactionDataRaw);
+
+const descriptionsAccountData = getDescriptionClusters(accountData);
 
 const writeTableToFile = async (filename: string, data: any[]) => {
   console.log("writing file %s", filename);
@@ -219,7 +227,7 @@ const writeTableToFile = async (filename: string, data: any[]) => {
   console.log("finished with file %s", filename);
 }
 
-await writeTableToFile("temp/accountData.txt", accountData);
-await writeTableToFile("temp/transactionData.txt", transactionData);
+await writeTableToFile("temp/parsed/degiroAccountData.txt", accountData);
+await writeTableToFile("temp/parsed/degiroTransactionData.txt", transactionData);
 
 const i = 0;
