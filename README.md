@@ -103,7 +103,7 @@ curl "https://www.alphavantage.co/query?function=CURRENCY_EXCHANGE_RATE&from_cur
 
 ## misc
 
-## format files
+### format files
 ```
 deno fmt src/**/*.ts
 ```
