@@ -2,14 +2,6 @@ import {
   parse as parseCsv,
 } from "https://deno.land/std@0.103.0/encoding/csv.ts";
 import table from "./table.ts";
-import { Client } from "../src/deps.ts";
-
-const client = new Client({
-  user: "hodler",
-  database: "hodler",
-  hostname: "localhost",
-  port: 5432,
-});
 
 const readCsvData = async (files: string[], doAccountDataFix = false) => {
   const result = (<string[][]>[]).concat(
@@ -61,17 +53,18 @@ const checkCurrency = (currencies: string[], whitelist: string[]) => {
 };
 
 const processAccountData = (data: string[][]) => {
+  let lastTotalCache: Record<string, number> = {};
   // Datum,Uhrze,Valutadatum,Produkt,ISIN,Beschreibung,FX,Änderung,,Saldo,,Order-ID
   return data.map(
     (
       [
         date,
         time,
-        valuaDate,
+        , //valuaDate,
         product,
         isin,
         description,
-        fx,
+        , //fx,
         changeCurrency,
         changeRaw,
         totalCurrency,
@@ -91,11 +84,29 @@ const processAccountData = (data: string[][]) => {
         ),
       );
       if (isNaN(timestamp.getTime())) {
-        console.error("wrong date/time detected");
         debugger;
+        throw new Error("wrong date/time detected");
       }
-      const change = changeRaw ? parseFloat(changeRaw.replace(",", ".")) : null;
+      let change = changeRaw ? parseFloat(changeRaw.replace(",", ".")) : null;
       const total = totalRaw ? parseFloat(totalRaw.replace(",", ".")) : null;
+      if (total === null) {
+        debugger;
+        throw new Error("cannot have empty total");
+      }
+      const lastTotal = lastTotalCache[totalCurrency] ?? 0;
+      lastTotalCache[totalCurrency] = total;
+      if (change === null) {
+        change = parseFloat((total - lastTotal).toFixed(2));
+        changeCurrency = totalCurrency
+        if (
+          !description.startsWith("Geldmarktfonds Umwandlung:")
+          && !description.startsWith("Überweisung auf Ihr Geldkonto bei der flatex Bank:")
+          && !description.startsWith("Auszahlung von Ihrem Geldkonto bei der flatex Bank:")
+        ) {
+          debugger;
+          throw new Error("cannot have empty change");
+        }
+      }
 
       checkCurrency([changeCurrency, totalCurrency], ["PLN", "USD", "EUR"]);
       return {
@@ -122,8 +133,8 @@ const processTransactionData = (data: string[][]) => {
         time,
         product,
         isin,
-        referenceExchange,
-        executionExchange,
+        , //referenceExchange,
+        , //executionExchange,
         amountRaw,
         quoteRaw,
         quoteCurrency,
@@ -220,13 +231,11 @@ const getDescriptionClusters = (data: any[]) => {
 const accountData = processAccountData(accountDataRaw);
 const transactionData = processTransactionData(transactionDataRaw);
 
-const descriptionsAccountData = getDescriptionClusters(accountData);
-
 const writeTableToFile = async (filename: string, data: any[]) => {
   console.log("writing file %s", filename);
   const headerRow = <any[]>Object.keys(data[0]);
   const tableData = [headerRow].concat(
-    data.map((entry) => Object.values(entry).map((part: any) => part === null ? "" : part))
+    data.map((entry) => Object.values(entry).map((part: any) => part === null ? "<null>" : part))
   );
 
   await Deno.writeTextFile(filename, table(tableData, {
@@ -251,8 +260,8 @@ CREATE TABLE IF NOT EXISTS t_degiro_account
     totalCurrency   VARCHAR(3),
     orderId         VARCHAR(36)
 );
-INSERT INTO t_degiro_account (timestamp, product, isin, description, change, changeCurrency, total, totalCurrency, orderId)
-VALUES 
+INSERT INTO t_degiro_account 
+    (timestamp, product, isin, description, change, changeCurrency, total, totalCurrency, orderId) VALUES
 ${
     data.map(
       (entry) => "(" + Object.values(entry).map(
@@ -278,16 +287,8 @@ ${
   console.log("finished with file %s", filename);
 }
 
-// await writeTableToFile("temp/parsed/degiroAccountData.txt", accountData);
+// const descriptionsAccountData = getDescriptionClusters(accountData);
+
+await writeTableToFile("temp/parsed/degiroAccountData.txt", accountData);
 await writeAccountSqlToFile("temp/parsed/degiroAccountData.sql", accountData);
-// await writeTableToFile("temp/parsed/degiroTransactionData.txt", transactionData);
-
-// try {
-//   await client.connect();
-//
-//
-// } finally {
-//   await client.end();
-// }
-
-const i = 0;
+await writeTableToFile("temp/parsed/degiroTransactionData.txt", transactionData);
