@@ -1,6 +1,6 @@
 import {
   parse as parseCsv,
-} from "https://deno.land/std@0.82.0/encoding/csv.ts";
+} from "https://deno.land/std@0.103.0/encoding/csv.ts";
 
 const readCsvData = async (files: string[]) => {
   const result = (<unknown[][]> []).concat(
