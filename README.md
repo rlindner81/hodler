@@ -8,14 +8,15 @@ keep track of profit and loss including
 - year to date performance
 - month to date performance
 
-keep track of money in all bank/brokerage accounts including
-- month over month performance
-- year to date performance
-- invested/(cash+invested) exposure 
-
 formulate and update investment theses (plays) for your stocks
 - predict developments and verify how well you did
 - learn from past mistakes
+
+keep track of money in all bank/brokerage accounts including
+- month over month performance
+- year to date performance
+- invested/(cash+invested) exposure
+
   
 
 ## runtime
@@ -107,12 +108,13 @@ curl "https://www.alphavantage.co/query?function=CURRENCY_EXCHANGE_RATE&from_cur
 ### format files
 ```
 deno fmt src/**/*.ts
+deno fmt src-util/**/*.ts
 ```
 
 ### options quotes
 ```
-#  run options-quotes
 deno run --unstable --allow-all src/misc/options-quotes.ts
+deno run --unstable --allow-all src-util/misc/read-degiro.ts
 ```
 
 ### data source

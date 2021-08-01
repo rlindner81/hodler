@@ -1,13 +1,11 @@
-# Hodler schema
+# hodler schema
 
-Date	Time	ISIN	Ticker	Broker	Amount	Price [Native]	"Fx Rate
-EurToNative"	"Fx Rate
-NativeToEur"	"Transaction Cost
-Native"	"Transaction Cost
-Eur"	"Transaction Cost
-ToEur"	"Weighted
-Price"	"Weighted
-ToEur"
+## init
+```bash
+psql -d postgres -c "CREATE ROLE hodler WITH LOGIN PASSWORD 'hodler';"
+psql -d postgres -c "CREATE DATABASE hodler WITH OWNER hodler;"
+psql -U hodler -d hodler < sql/01_schema_init.sql
+```
 
 ## Currency
 - Semantic Key
@@ -80,10 +78,3 @@ PRO
 
 TODO
 - can we compute losses due to exchange rates changing efficiently?
-
-## init
-```bash
-psql -d postgres -c "CREATE ROLE hodler WITH LOGIN PASSWORD 'hodler';"
-psql -d postgres -c "CREATE DATABASE hodler WITH OWNER hodler;"
-psql -U hodler -d hodler < schema_init.sql
-```
