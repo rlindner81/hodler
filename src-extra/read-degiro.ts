@@ -1,14 +1,17 @@
 import {
   parse as parseCsv,
 } from "https://deno.land/std@0.103.0/encoding/csv.ts";
+import table from "./table.ts";
 
-const readCsvData = async (files: string[]) => {
-  const result = (<string[][]> []).concat(
+const readCsvData = async (files: string[], doFix = false) => {
+  const result = (<string[][]>[]).concat(
     ...await Promise.all(
-      files.map(async (file) =>
-        (<string[]> await parseCsv(await Deno.readTextFile(file))).slice(1)
-          .reverse()
-      ),
+      files.map(async (file) => {
+        const inputData = await Deno.readTextFile(file);
+        // ,,,S...,,,,,,,,8ec0-5d687df53bc2
+        const fixedInputData = doFix ? inputData.replace(/\n,,,[^,]*,,,,,,,,/g, "") : inputData;
+        return (<string[]>await parseCsv(fixedInputData)).slice(1).reverse();
+      }),
     ),
   );
 
@@ -22,20 +25,20 @@ const readCsvData = async (files: string[]) => {
 };
 
 const accountFiles = [
-  "../temp/degiro-bookings-2017-Account.csv",
-  "../temp/degiro-bookings-2018-Account.csv",
-  "../temp/degiro-bookings-2019-Account.csv",
-  "../temp/degiro-bookings-2020-Account.csv",
-  "../temp/degiro-bookings-2021-ongoing-Account.csv",
+  "temp/degiro-bookings-2017-Account.csv",
+  "temp/degiro-bookings-2018-Account.csv",
+  "temp/degiro-bookings-2019-Account.csv",
+  "temp/degiro-bookings-2020-Account.csv",
+  "temp/degiro-bookings-2021-ongoing-Account.csv",
 ];
 
 const transactionFiles = [
-  "../temp/degiro-Transactions-2017.csv",
-  "../temp/degiro-Transactions-2020.csv",
-  "../temp/degiro-Transactions-2021-ongoing.csv",
+  "temp/degiro-Transactions-2017.csv",
+  "temp/degiro-Transactions-2020.csv",
+  "temp/degiro-Transactions-2021-ongoing.csv",
 ];
 
-const accountDataRaw = await readCsvData(accountFiles);
+const accountDataRaw = await readCsvData(accountFiles, true);
 const transactionDataRaw = await readCsvData(transactionFiles);
 
 const checkCurrency = (currencies: string[], whitelist: string[]) => {
@@ -92,15 +95,19 @@ const processAccountData = (data: string[][]) => {
           parseInt(minute),
         ),
       );
+      if (isNaN(timestamp.getTime())) {
+        console.error("wrong date/time detected");
+        debugger;
+      }
       const change = changeRaw ? parseFloat(changeRaw.replace(",", ".")) : null;
       const total = totalRaw ? parseFloat(totalRaw.replace(",", ".")) : null;
       const [, description] =
-        new RegExp(`^(${descriptionTypes.join("|")}|.*).*?$`).exec(
-          descriptionRaw,
-        ) ?? [];
+      new RegExp(`^(${descriptionTypes.join("|")}|.*).*?$`).exec(
+        descriptionRaw,
+      ) ?? [];
       descriptions.add(description);
 
-      checkCurrency([changeCurrency, totalCurrency], ["USD", "EUR"]);
+      checkCurrency([changeCurrency, totalCurrency], ["PLN", "USD", "EUR"]);
       return {
         timestamp,
         product,
@@ -198,5 +205,21 @@ const processTransactionData = (data: string[][]) => {
 
 const accountData = processAccountData(accountDataRaw);
 const transactionData = processTransactionData(transactionDataRaw);
+
+const writeTableToFile = async (filename: string, data: any[]) => {
+  console.log("writing file %s", filename);
+  const headerRow = <any[]>Object.keys(data[0]);
+  const tableData = [headerRow].concat(
+    data.map((entry) => Object.values(entry).map((part: any) => part === null ? "" : part))
+  );
+
+  await Deno.writeTextFile(filename, table(tableData, {
+    sortCol: null,
+  }) ?? "");
+  console.log("finished with file %s", filename);
+}
+
+await writeTableToFile("temp/accountData.txt", accountData);
+await writeTableToFile("temp/transactionData.txt", transactionData);
 
 const i = 0;
