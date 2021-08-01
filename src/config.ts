@@ -1,9 +1,9 @@
 interface Config {
-  port: number,
-  proxy: boolean,
-  cookieKey?: string,
-  hodlerKey?: string,
-  tradierKey?: string,
+  port: number;
+  proxy: boolean;
+  cookieKey?: string;
+  hodlerKey?: string;
+  tradierKey?: string;
 }
 
 const setConfigFromEnv = (): Config => {
@@ -20,9 +20,9 @@ const setConfigFromEnv = (): Config => {
   return {
     port,
     proxy,
-    ...(cookieKey && { cookieKey}),
-    ...(hodlerKey && { hodlerKey}),
-    ...(tradierKey && { tradierKey}),
+    ...(cookieKey && { cookieKey }),
+    ...(hodlerKey && { hodlerKey }),
+    ...(tradierKey && { tradierKey }),
   };
 };
 

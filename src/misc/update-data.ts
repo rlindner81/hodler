@@ -1,4 +1,4 @@
-import { exists } from "https://deno.land/std@0.101.0/fs/mod.ts";
+import { exists } from "https://deno.land/std@0.103.0/fs/mod.ts";
 import { getMarketHistory } from "../util/tradier.ts";
 
 type Stock = Record<"symbol" | "amount", string>;
