@@ -38,7 +38,7 @@ deno run --unstable --allow-all src/server.ts
 - Validasaur for input validation https://deno.land/x/validasaur
 - Postgres for persistence https://deno.land/x/postgres
 
-## update deno dependencies
+### update deno dependencies
 https://github.com/hayd/deno-udd
 ```
 # setup
