@@ -1,5 +1,22 @@
 # hodler
 
+get an overview of your financials. 
+
+keep track of profit and loss (p/l) including
+- breakdown realized/unrealized
+- breakdown across brokerages
+- compare current p/l to beginning of month or year
+
+keep track of money in all bank/brokerage accounts including
+- month over month (m/m) performance
+- year to date (ytd) performance
+- invested/(cash+invested) exposure 
+
+formulate and update investment theses (plays) for your stocks
+- predict developments and verify how well you did
+- learn from past mistakes
+  
+
 ## runtime
 
 - https://deno.land/
