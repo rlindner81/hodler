@@ -2,6 +2,14 @@ import {
   parse as parseCsv,
 } from "https://deno.land/std@0.103.0/encoding/csv.ts";
 import table from "./table.ts";
+import { Client } from "../src/deps.ts";
+
+const client = new Client({
+  user: "hodler",
+  database: "hodler",
+  hostname: "localhost",
+  port: 5432,
+});
 
 const readCsvData = async (files: string[], doAccountDataFix = false) => {
   const result = (<string[][]>[]).concat(
@@ -227,7 +235,59 @@ const writeTableToFile = async (filename: string, data: any[]) => {
   console.log("finished with file %s", filename);
 }
 
-await writeTableToFile("temp/parsed/degiroAccountData.txt", accountData);
-await writeTableToFile("temp/parsed/degiroTransactionData.txt", transactionData);
+const writeAccountSqlToFile = async (filename: string, data: any[]) => {
+  console.log("writing file %s", filename);
+  const result = `
+DROP TABLE IF EXISTS t_degiro_account CASCADE;
+CREATE TABLE IF NOT EXISTS t_degiro_account
+(
+    timestamp       TIMESTAMP NOT NULL,
+    product         VARCHAR(1000),
+    isin            VARCHAR(1000),
+    description     VARCHAR(1000),
+    change          NUMERIC(8,2),
+    changeCurrency  VARCHAR(3),
+    total           NUMERIC(8,2),
+    totalCurrency   VARCHAR(3),
+    orderId         VARCHAR(36)
+);
+INSERT INTO t_degiro_account (timestamp, product, isin, description, change, changeCurrency, total, totalCurrency, orderId)
+VALUES 
+${
+    data.map(
+      (entry) => "(" + Object.values(entry).map(
+        (part) => {
+          if (part === null) {
+            return "NULL";
+          }
+          if (part instanceof Date) {
+              return "'" + part.toISOString() + "'";
+          }
+          if (typeof part === "number") {
+            return part;
+          }
+          return "'" + part + "'";
+        }
+      ).join(", ") + ")"
+    ).join(",\n")
+  }
+;
+`
+
+  await Deno.writeTextFile(filename, result);
+  console.log("finished with file %s", filename);
+}
+
+// await writeTableToFile("temp/parsed/degiroAccountData.txt", accountData);
+await writeAccountSqlToFile("temp/parsed/degiroAccountData.sql", accountData);
+// await writeTableToFile("temp/parsed/degiroTransactionData.txt", transactionData);
+
+// try {
+//   await client.connect();
+//
+//
+// } finally {
+//   await client.end();
+// }
 
 const i = 0;
