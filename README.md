@@ -2,14 +2,15 @@
 
 get an overview of your financials. 
 
-keep track of profit and loss (p/l) including
+keep track of profit and loss including
 - breakdown realized/unrealized
 - breakdown across brokerages
-- compare current p/l to beginning of month or year
+- year to date performance
+- month to date performance
 
 keep track of money in all bank/brokerage accounts including
-- month over month (m/m) performance
-- year to date (ytd) performance
+- month over month performance
+- year to date performance
 - invested/(cash+invested) exposure 
 
 formulate and update investment theses (plays) for your stocks
