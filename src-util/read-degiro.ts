@@ -6,7 +6,8 @@ const readCsvData = async (files: string[]) => {
   const result = (<string[][]> []).concat(
     ...await Promise.all(
       files.map(async (file) =>
-        (<string[]>await parseCsv(await Deno.readTextFile(file))).slice(1).reverse()
+        (<string[]> await parseCsv(await Deno.readTextFile(file))).slice(1)
+          .reverse()
       ),
     ),
   );
@@ -37,6 +38,17 @@ const transactionFiles = [
 const accountDataRaw = await readCsvData(accountFiles);
 const transactionDataRaw = await readCsvData(transactionFiles);
 
+const checkCurrency = (currencies: string[], whitelist: string[]) => {
+  if (
+    currencies.filter(
+      (currency) => currency && !whitelist.includes(currency),
+    ).length !== 0
+  ) {
+    console.error("got unexpected currency: %O", currencies);
+    debugger;
+  }
+};
+
 const processAccountData = (data: string[][]) => {
   const descriptions = new Set();
 
@@ -48,47 +60,143 @@ const processAccountData = (data: string[][]) => {
     "Überweisung auf Ihr Geldkonto bei der flatex Bank",
     "Auszahlung von Ihrem Geldkonto bei der flatex Bank",
     "ISIN-ÄNDERUNG",
-    "Einrichtung von Handelsmodalitäten"
-  ]
+    "Einrichtung von Handelsmodalitäten",
+  ];
 
   // Datum,Uhrze,Valutadatum,Produkt,ISIN,Beschreibung,FX,Änderung,,Saldo,,Order-ID
   return data.map(
-    ([date, time, valuaDate, product, isin, descriptionRaw, fx, changeCurrency, changeRaw, totalCurrency, totalRaw, orderId]) => {
-    const [, day, month, year] = /^(\d{2})-(\d{2})-(\d{4})$/.exec(date) ?? [];
-    const [, hour, minute] = /^(\d{2}):(\d{2})$/.exec(time) ?? [];
-    const timestamp = new Date(Date.UTC(parseInt(year), parseInt(month) - 1, parseInt(day),  parseInt(hour),  parseInt(minute)));
-    const change = parseFloat(changeRaw.replace(",", "."));
-    const total = parseFloat(totalRaw.replace(",", "."));
-    const [, description] = new RegExp(`^(${descriptionTypes.join("|")}|.*).*?$`).exec(descriptionRaw) ?? [];
-    descriptions.add(description);
-    return {
-      timestamp,
-      product,
-      isin,
-      description,
-      change,
-      total,
-      orderId
-    };
-  }
+    (
+      [
+        date,
+        time,
+        valuaDate,
+        product,
+        isin,
+        descriptionRaw,
+        fx,
+        changeCurrency,
+        changeRaw,
+        totalCurrency,
+        totalRaw,
+        orderId,
+      ],
+    ) => {
+      const [, day, month, year] = /^(\d{2})-(\d{2})-(\d{4})$/.exec(date) ?? [];
+      const [, hour, minute] = /^(\d{2}):(\d{2})$/.exec(time) ?? [];
+      const timestamp = new Date(
+        Date.UTC(
+          parseInt(year),
+          parseInt(month) - 1,
+          parseInt(day),
+          parseInt(hour),
+          parseInt(minute),
+        ),
+      );
+      const change = changeRaw ? parseFloat(changeRaw.replace(",", ".")) : null;
+      const total = totalRaw ? parseFloat(totalRaw.replace(",", ".")) : null;
+      const [, description] =
+        new RegExp(`^(${descriptionTypes.join("|")}|.*).*?$`).exec(
+          descriptionRaw,
+        ) ?? [];
+      descriptions.add(description);
+
+      checkCurrency([changeCurrency, totalCurrency], ["USD", "EUR"]);
+      return {
+        timestamp,
+        product,
+        isin,
+        description,
+        change,
+        changeCurrency,
+        total,
+        totalCurrency,
+        orderId,
+      };
+    },
   );
-}
+};
 
 const processTransactionData = (data: string[][]) => {
   // Datum,Uhrzeit,Produkt,ISIN,Referenzbörse,Ausführungsort,Anzahl,Kurs,,Wert in Lokalwährung,,Wert,,Wechselkurs,Transaktionskosten,,Gesamt,,Order-ID
   return data.map(
-    ([date, time, product, isin, referenceExchange, executionExchange, amountRaw, quoteRaw, quoteCurrency, localPriceRaw, localPriceCurrency, priceRaw, priceCurrency, fxRate, transactionCostRaw, transactionCostCurrency, totalRaw, totalCurrency, orderId]) => {
+    (
+      [
+        date,
+        time,
+        product,
+        isin,
+        referenceExchange,
+        executionExchange,
+        amountRaw,
+        quoteRaw,
+        quoteCurrency,
+        nativeWorthRaw,
+        nativeWorthCurrency,
+        worthRaw,
+        worthCurrency,
+        fxRateRaw,
+        transactionCostRaw,
+        transactionCostCurrency,
+        totalRaw,
+        totalCurrency,
+        orderId,
+      ],
+    ) => {
       const [, day, month, year] = /^(\d{2})-(\d{2})-(\d{4})$/.exec(date) ?? [];
       const [, hour, minute] = /^(\d{2}):(\d{2})$/.exec(time) ?? [];
-      const timestamp = new Date(Date.UTC(parseInt(year), parseInt(month) - 1, parseInt(day),  parseInt(hour),  parseInt(minute)));
-      // const change = parseFloat(changeRaw.replace(",", "."));
-      // const total = parseFloat(totalRaw.replace(",", "."));
+      const timestamp = new Date(
+        Date.UTC(
+          parseInt(year),
+          parseInt(month) - 1,
+          parseInt(day),
+          parseInt(hour),
+          parseInt(minute),
+        ),
+      );
+      const amount = amountRaw ? parseInt(amountRaw) : null;
+      const quote = quoteRaw ? parseFloat(quoteRaw) : null;
+      const localWorth = nativeWorthRaw ? parseFloat(nativeWorthRaw) : null;
+      const worth = worthRaw ? parseFloat(worthRaw) : null;
+      const fxRate = fxRateRaw ? parseFloat(fxRateRaw) : null;
+      const transactionCost = transactionCostRaw
+        ? parseFloat(transactionCostRaw)
+        : null;
+      const total = totalRaw ? parseFloat(totalRaw) : null;
+
+      if (
+        fxRate &&
+        (String(fxRate) + "000").slice(0, fxRateRaw.length) !== fxRateRaw
+      ) {
+        console.error("error precision problem %s !== %s", fxRate, fxRateRaw);
+        debugger;
+      }
+      checkCurrency([quoteCurrency, nativeWorthCurrency], ["USD", "EUR"]);
+      checkCurrency([worthCurrency, transactionCostCurrency, totalCurrency], [
+        "EUR",
+      ]);
       return {
-        timestamp
+        timestamp,
+        product,
+        isin,
+        amount,
+        quote,
+        quoteCurrency,
+        localWorth,
+        localWorthCurrency: nativeWorthCurrency,
+        worth,
+        worthCurrency,
+        transactionCost,
+        transactionCostCurrency,
+        total,
+        totalCurrency,
+        fxRate,
+        orderId,
       };
-    }
+    },
   );
-}
+};
 
 const accountData = processAccountData(accountDataRaw);
 const transactionData = processTransactionData(transactionDataRaw);
+
+const i = 0;
