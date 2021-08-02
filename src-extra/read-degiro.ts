@@ -3,6 +3,75 @@ import {
 } from "https://deno.land/std@0.103.0/encoding/csv.ts";
 import table from "./table.ts";
 
+const accountFiles = [
+  "temp/raw/degiro-bookings-2017-Account.csv",
+  "temp/raw/degiro-bookings-2018-Account.csv",
+  "temp/raw/degiro-bookings-2019-Account.csv",
+  "temp/raw/degiro-bookings-2020-Account.csv",
+  "temp/raw/degiro-bookings-2021-ongoing-Account.csv",
+];
+
+const transactionFiles = [
+  "temp/raw/degiro-Transactions-2017.csv",
+  "temp/raw/degiro-Transactions-2020.csv",
+  "temp/raw/degiro-Transactions-2021-ongoing.csv",
+];
+
+const accountCatgories = [
+  {
+    name: "CASH_LOAD",
+    tester: [/^(?:flatex )?Einzahlung$/]
+  },
+  {
+    name: "CASH_UNLOAD",
+    tester: [/^(?:flatex )?Auszahlung$/]
+  },
+  {
+    name: "CASH_PROCESSING",
+    tester: ["Processed Flatex Withdrawal"]
+  },
+  {
+    name: "DIVIDENDE",
+    tester: [
+      "Dividende",
+      "Dividendensteuer",
+      "Wiederveranlagung Dividende",
+    ]
+  },
+  {
+    name: "STOCK_BUY",
+    tester: [/^Kauf/]
+  },
+  {
+    name: "STOCK_SELL",
+    tester: [/^Verkauf/]
+  },
+  {
+    name: "STOCK_SYMBOL_CHANGE",
+    tester: [/^ISIN-ÄNDERUNG/]
+  },
+  {
+    name: "CASH_EXCHANGE",
+    tester: [/^Währungswechsel \((?:Einbuchung|Ausbuchung)\)$/]
+  },
+  {
+    name: "TRANSACTION_COST",
+    tester: ["Transaktionsgebühr"]
+  },
+  {
+    name: "MONEY_FUND_OLD",
+    tester: [/^Geldmarktfonds/]
+  },
+  {
+    name: "MONEY_FUND",
+    tester: [
+      "Degiro Cash Sweep Transfer",
+      /^Überweisung auf Ihr Geldkonto bei der flatex Bank:.*$/,
+      /^Auszahlung von Ihrem Geldkonto bei der flatex Bank:.*$/,
+    ]
+  },
+];
+
 const readCsvData = async (files: string[], doAccountDataFix = false) => {
   const result = (<string[][]>[]).concat(
     ...await Promise.all(
@@ -23,23 +92,6 @@ const readCsvData = async (files: string[], doAccountDataFix = false) => {
   }
   return result;
 };
-
-const accountFiles = [
-  "temp/raw/degiro-bookings-2017-Account.csv",
-  "temp/raw/degiro-bookings-2018-Account.csv",
-  "temp/raw/degiro-bookings-2019-Account.csv",
-  "temp/raw/degiro-bookings-2020-Account.csv",
-  "temp/raw/degiro-bookings-2021-ongoing-Account.csv",
-];
-
-const transactionFiles = [
-  "temp/raw/degiro-Transactions-2017.csv",
-  "temp/raw/degiro-Transactions-2020.csv",
-  "temp/raw/degiro-Transactions-2021-ongoing.csv",
-];
-
-const accountDataRaw = await readCsvData(accountFiles, true);
-const transactionDataRaw = await readCsvData(transactionFiles);
 
 const checkCurrency = (currencies: string[], whitelist: string[]) => {
   if (
@@ -75,13 +127,11 @@ const processAccountData = (data: string[][]) => {
       const [, day, month, year] = /^(\d{2})-(\d{2})-(\d{4})$/.exec(date) ?? [];
       const [, hour, minute] = /^(\d{2}):(\d{2})$/.exec(time) ?? [];
       const timestamp = new Date(
-        Date.UTC(
-          parseInt(year),
-          parseInt(month) - 1,
-          parseInt(day),
-          parseInt(hour),
-          parseInt(minute),
-        ),
+        parseInt(year),
+        parseInt(month) - 1,
+        parseInt(day),
+        parseInt(hour),
+        parseInt(minute),
       );
       if (isNaN(timestamp.getTime())) {
         debugger;
@@ -107,6 +157,14 @@ const processAccountData = (data: string[][]) => {
           throw new Error("cannot have empty change");
         }
       }
+      const category = accountCatgories.find(
+        (category) => category.tester.filter(
+          (tester) =>
+            typeof tester === "string"
+              ? description === tester
+              : tester.test(description)
+        ).length !== 0
+      )?.name ?? "OTHER";
 
       checkCurrency([changeCurrency, totalCurrency], ["PLN", "USD", "EUR"]);
       return {
@@ -114,6 +172,7 @@ const processAccountData = (data: string[][]) => {
         product,
         isin,
         description,
+        category,
         change,
         changeCurrency,
         total,
@@ -153,26 +212,33 @@ const processTransactionData = (data: string[][]) => {
       const [, day, month, year] = /^(\d{2})-(\d{2})-(\d{4})$/.exec(date) ?? [];
       const [, hour, minute] = /^(\d{2}):(\d{2})$/.exec(time) ?? [];
       const timestamp = new Date(
-        Date.UTC(
-          parseInt(year),
-          parseInt(month) - 1,
-          parseInt(day),
-          parseInt(hour),
-          parseInt(minute),
-        ),
+        parseInt(year),
+        parseInt(month) - 1,
+        parseInt(day),
+        parseInt(hour),
+        parseInt(minute),
       );
       const amount = amountRaw ? parseInt(amountRaw) : null;
       const quote = quoteRaw ? parseFloat(quoteRaw) : null;
       const localWorth = nativeWorthRaw ? parseFloat(nativeWorthRaw) : null;
       const worth = worthRaw ? parseFloat(worthRaw) : null;
-      const fxRate = fxRateRaw ? parseFloat(fxRateRaw) : null;
-      const transactionCost = transactionCostRaw
+      let fxRate = fxRateRaw ? parseFloat(fxRateRaw) : null;
+      let transactionCost = transactionCostRaw
         ? parseFloat(transactionCostRaw)
         : null;
       const total = totalRaw ? parseFloat(totalRaw) : null;
 
+      if (fxRate === null && quoteCurrency === "EUR") {
+        fxRate = 1;
+      }
+
+      if (transactionCost === null) {
+        transactionCost = 0;
+        transactionCostCurrency = quoteCurrency
+      }
+
       if (
-        fxRate &&
+        fxRateRaw && fxRate &&
         (String(fxRate) + "000").slice(0, fxRateRaw.length) !== fxRateRaw
       ) {
         console.error("error precision problem %s !== %s", fxRate, fxRateRaw);
@@ -204,33 +270,6 @@ const processTransactionData = (data: string[][]) => {
   );
 };
 
-const getDescriptionClusters = (data: any[]) => {
-  const descriptions = new Set();
-
-  const descriptionTypes = [
-    "Kauf",
-    "Verkauf",
-    "Geldmarktfonds Umwandlung: Kauf",
-    "Geldmarktfonds Umwandlung: Verkauf",
-    "Überweisung auf Ihr Geldkonto bei der flatex Bank",
-    "Auszahlung von Ihrem Geldkonto bei der flatex Bank",
-    "ISIN-ÄNDERUNG",
-    "Einrichtung von Handelsmodalitäten",
-  ];
-
-  for (const entry of data) {
-    const [, description] =
-    new RegExp(`^(${descriptionTypes.join("|")}|.*).*?$`).exec(
-      entry.description,
-    ) ?? [];
-    descriptions.add(description);
-  }
-  return descriptions;
-}
-
-const accountData = processAccountData(accountDataRaw);
-const transactionData = processTransactionData(transactionDataRaw);
-
 const writeTableToFile = async (filename: string, data: any[]) => {
   console.log("writing file %s", filename);
   const headerRow = <any[]>Object.keys(data[0]);
@@ -251,9 +290,10 @@ DROP TABLE IF EXISTS t_degiro_account CASCADE;
 CREATE TABLE IF NOT EXISTS t_degiro_account
 (
     timestamp       TIMESTAMP NOT NULL,
-    product         VARCHAR(1000),
-    isin            VARCHAR(1000),
-    description     VARCHAR(1000),
+    product         VARCHAR(512),
+    isin            VARCHAR(512),
+    description     VARCHAR(512),
+    category        VARCHAR(512),
     change          NUMERIC(8,2),
     changeCurrency  VARCHAR(3),
     total           NUMERIC(8,2),
@@ -261,7 +301,7 @@ CREATE TABLE IF NOT EXISTS t_degiro_account
     orderId         VARCHAR(36)
 );
 INSERT INTO t_degiro_account 
-    (timestamp, product, isin, description, change, changeCurrency, total, totalCurrency, orderId) VALUES
+    (timestamp, product, isin, description, category, change, changeCurrency, total, totalCurrency, orderId) VALUES
 ${
     data.map(
       (entry) => "(" + Object.values(entry).map(
@@ -287,8 +327,15 @@ ${
   console.log("finished with file %s", filename);
 }
 
-// const descriptionsAccountData = getDescriptionClusters(accountData);
+const accountDataRaw = await readCsvData(accountFiles, true);
+const transactionDataRaw = await readCsvData(transactionFiles);
+
+const accountData = processAccountData(accountDataRaw);
+const transactionData = processTransactionData(transactionDataRaw);
 
 await writeTableToFile("temp/parsed/degiroAccountData.txt", accountData);
 await writeAccountSqlToFile("temp/parsed/degiroAccountData.sql", accountData);
 await writeTableToFile("temp/parsed/degiroTransactionData.txt", transactionData);
+
+debugger;
+Deno.exit();
