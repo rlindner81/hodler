@@ -327,6 +327,72 @@ ${
   console.log("finished with file %s", filename);
 }
 
+// timestamp
+// product
+// isin
+// amount
+// quote
+// quoteCurrency
+// localWorth
+// localWorthCurrency
+// worth
+// worthCurrency
+// transactionCost
+// transactionCostCurrency
+// total
+// totalCurrency
+// fxRate
+// orderId
+const writeTransactionSqlToFile = async (filename: string, data: any[]) => {
+  console.log("writing file %s", filename);
+  const result = `
+DROP TABLE IF EXISTS t_degiro_transaction CASCADE;
+CREATE TABLE IF NOT EXISTS t_degiro_transaction
+(
+    timestamp                TIMESTAMP NOT NULL,
+    product                  VARCHAR(512),
+    isin                     VARCHAR(512),
+    amount                   INTEGER,
+    quote                    NUMERIC(8,2),
+    quoteCurrency            VARCHAR(3),
+    localWorth               NUMERIC(8,2),
+    localWorthCurrency       VARCHAR(3),
+    worth                    NUMERIC(8,2),
+    worthCurrency            VARCHAR(3),
+    transactionCost          NUMERIC(8,2),
+    transactionCostCurrency  VARCHAR(3),
+    total                    NUMERIC(8,2),
+    totalCurrency            VARCHAR(3),
+    fxRate                   NUMERIC(20,4),
+    orderId                  VARCHAR(36)
+);
+INSERT INTO t_degiro_transaction 
+    (timestamp, product, isin, amount, quote, quoteCurrency, localWorth, localWorthCurrency, worth, worthCurrency, transactionCost, transactionCostCurrency, total, totalCurrency, fxRate, orderId) VALUES
+${
+    data.map(
+      (entry) => "(" + Object.values(entry).map(
+        (part) => {
+          if (part === null) {
+            return "NULL";
+          }
+          if (part instanceof Date) {
+            return "'" + part.toISOString() + "'";
+          }
+          if (typeof part === "number") {
+            return part;
+          }
+          return "'" + part + "'";
+        }
+      ).join(", ") + ")"
+    ).join(",\n")
+  }
+;
+`
+
+  await Deno.writeTextFile(filename, result);
+  console.log("finished with file %s", filename);
+}
+
 const accountDataRaw = await readCsvData(accountFiles, true);
 const transactionDataRaw = await readCsvData(transactionFiles);
 
@@ -336,6 +402,7 @@ const transactionData = processTransactionData(transactionDataRaw);
 await writeTableToFile("temp/parsed/degiroAccountData.txt", accountData);
 await writeAccountSqlToFile("temp/parsed/degiroAccountData.sql", accountData);
 await writeTableToFile("temp/parsed/degiroTransactionData.txt", transactionData);
+await writeTransactionSqlToFile("temp/parsed/degiroTransactionData.sql", transactionData);
 
 debugger;
 Deno.exit();
