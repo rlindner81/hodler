@@ -387,6 +387,58 @@ ${
     ).join(",\n")
   }
 ;
+
+DROP VIEW IF EXISTS v_degiro_transaction_buy_sell;
+CREATE OR REPLACE VIEW v_degiro_transaction_buy_sell AS SELECT isin,
+       product,
+       SUM(CASE
+               WHEN amount > 0 THEN amount
+               ELSE 0
+           END)                AS shares_bought,
+       SUM(CASE
+               WHEN amount < 0 THEN amount
+               ELSE 0
+           END)                AS shares_sold,
+       SUM(CASE
+               WHEN amount > 0 THEN localworth
+               ELSE 0
+           END)                AS sum_native_worth_buy,
+       SUM(CASE
+               WHEN amount < 0 THEN localworth
+               ELSE 0
+           END)                AS sum_native_worth_sell,
+       localworthcurrency      AS native_worth_currency,
+       SUM(CASE
+               WHEN amount > 0 THEN worth
+               ELSE 0
+           END)                AS sum_worth_buy,
+       SUM(CASE
+               WHEN amount < 0 THEN worth
+               ELSE 0
+           END)                AS sum_worth_sell,
+       worthcurrency           AS worth_currency,
+       SUM(CASE
+               WHEN amount > 0 THEN transactioncost
+               ELSE 0
+           END)                AS sum_transaction_cost_buy,
+       SUM(CASE
+               WHEN amount < 0 THEN transactioncost
+               ELSE 0
+           END)                AS sum_transaction_cost_sell,
+       transactioncostcurrency AS transaction_cost_currency,
+       SUM(CASE
+               WHEN amount > 0 THEN total
+               ELSE 0
+           END)                AS sum_total_buy,
+       SUM(CASE
+               WHEN amount < 0 THEN total
+               ELSE 0
+           END)                AS sum_total_sell,
+       totalcurrency           AS total_currency
+FROM t_degiro_transaction
+GROUP BY isin, product,
+         localworthcurrency, worthcurrency, transactioncostcurrency, totalcurrency
+ORDER BY isin, product;
 `
 
   await Deno.writeTextFile(filename, result);
