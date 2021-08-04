@@ -1,4 +1,4 @@
-import { getMarketHistory, getMarketQuotes } from "../src/util/tradier.ts";
+import { getMarketHistory, getMarketQuotes } from "../backend/src/util/tradier.ts";
 import table from "./table.ts";
 
 const SYMBOLS = [

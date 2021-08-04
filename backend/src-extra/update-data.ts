@@ -1,5 +1,5 @@
 import { exists } from "https://deno.land/std@0.103.0/fs/mod.ts";
-import { getMarketHistory } from "../src/util/tradier.ts";
+import { getMarketHistory } from "../backend/src/util/tradier.ts";
 
 type Stock = Record<"symbol" | "amount", string>;
 

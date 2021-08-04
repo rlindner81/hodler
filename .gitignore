@@ -1,4 +1,2 @@
 .idea/
-deno_cache/
 temp/
-history-*.json
