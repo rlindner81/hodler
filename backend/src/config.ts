@@ -8,7 +8,7 @@ interface Config {
 
 const setConfigFromEnv = (): Config => {
   const envPort = Deno.env.get("PORT");
-  const port = envPort ? parseInt(envPort) : 8080;
+  const port = envPort ? parseInt(envPort) : 4040;
 
   const envProxy = Deno.env.get("PROXY");
   const proxy = envProxy ? /^t(?:rue)?$/.test(envProxy) : false;

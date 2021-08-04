@@ -24,7 +24,7 @@ app.use(async (ctx: Context, next: () => Promise<unknown>) => {
   }
 });
 
-const rootRouter = RootRouter({ prefix: "/" });
+const rootRouter = RootRouter({ prefix: "/api" });
 app.use(rootRouter.allowedMethods());
 app.use(rootRouter.routes());
 
