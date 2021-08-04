@@ -1,30 +1,35 @@
 <template>
   <div id="nav">
-    <router-link to="/">Home</router-link> |
+    <router-link to="/">Overview</router-link> |
+    <router-link to="/profit">Profit & Loss</router-link> |
+    <router-link to="/plays">Play Theses</router-link> |
+    <router-link to="/holdings">Holdings</router-link> |
     <router-link to="/about">About</router-link>
   </div>
   <router-view />
 </template>
 
-<style>
-#app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
+<style lang="scss">
+@import url('https://fonts.googleapis.com/css?family=Lato');
+
+#app * {
+  font-family: 'Lato', Avenir, Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
+  //color: black;
 }
 
 #nav {
-  padding: 30px;
-}
+  /*text-align: right;*/
+  padding: 1em 3em;
 
-#nav a {
-  font-weight: bold;
-  color: #2c3e50;
-}
+  a {
+    font-weight: bold;
+    text-decoration: none;
 
-#nav a.router-link-exact-active {
-  color: #42b983;
+    .router-link-exact-active {
+      color: #42b983;
+    }
+  }
 }
 </style>

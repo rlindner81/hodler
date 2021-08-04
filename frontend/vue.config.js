@@ -2,6 +2,12 @@
 
 // https://cli.vuejs.org/config/
 module.exports = {
+  pages: {
+    index: {
+      entry: 'src/main.js',
+      title: 'Hodler',
+    },
+  },
   devServer: {
     contentBase: './public',
     proxy: {
