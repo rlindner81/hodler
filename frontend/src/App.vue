@@ -32,10 +32,9 @@
     text-decoration: none;
     background-color: hsla(60, 45%, 42%, 0.15);
 
-  }
-
-  a:hover, a.router-link-exact-active {
-    background-color: white;
+    &:hover, &.router-link-exact-active {
+      background-color: white;
+    }
   }
 }
 </style>
