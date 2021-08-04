@@ -1,74 +1,99 @@
 <template>
   <div class="profit">
     <h1>Profit & Loss</h1>
-    <div class="list">
-      <div v-for="stock in stocks" :key="stock.ticker">
-        <span class="ticker">{{stock.ticker}}</span><span class="price">{{stock.price}}</span><span class="currency">{{stock.currency}}</span>
-      </div>
-    </div>
+    <table class="list">
+      <tr>
+        <th>Ticker</th>
+        <th>Price</th>
+      </tr>
+      <tr class="row" v-for="stock in stocks" :key="stock.ticker">
+        <td class="cell ticker">{{ stock.ticker }}</td>
+        <td class="cell price">{{ stock.price }}{{ stock.currency }}</td>
+      </tr>
+    </table>
   </div>
 </template>
 
 <style lang="scss">
-.list > {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  flex-wrap: wrap;
+.profit {
+  padding: 0 1rem;
 
-  //> .game {
-  //  .flexRow();
-  //
-  //  width: 100%;
-  //  flex-wrap: wrap;
-  //  border-bottom: 3px solid @color-background;
-  //
-  //  > .league > span {
-  //    .mp(15px, 5px);
-  //    .size(35px, 35px);
-  //    .background();
-  //
-  //    line-height: 25px;
-  //    border-radius: 50%;
-  //    display: block;
-  //    box-sizing: border-box;
-  //    font-size: 0.7rem;
-  //    text-transform: lowercase;
-  //  }
-  //
-  //  > .players {
-  //    .flexRow();
-  //
-  //    justify-content: space-around;
-  //    flex-grow: 1;
-  //    margin: 0;
-  //    padding: 15px 0;
-  //    width: 100%;
-  //
-  //    > .team {
-  //      .flexCenter();
-  //      width: 40%;
-  //      flex-shrink: 0;
-  //    }
-  //  }
-  //
-  //  > .other {
-  //    .backgroundSecondary();
-  //
-  //    width: 100%;
-  //    padding: 5px 15px;
-  //
-  //    .flexRow();
-  //    > .info {
-  //      padding: 5px;
-  //      font-size: 0.7rem;
-  //
-  //      > i {
-  //        margin-right: 10px;
-  //      }
-  //    }
-  //  }
-  //}
+  .list {
+    border-collapse: collapse;
+    width: 100%;
+
+    td, th {
+      border: 1px solid #ddd;
+      padding: 0.5rem;
+    }
+
+    tr:nth-child(even){background-color: #f2f2f2;}
+
+    tr:hover {background-color: #ddd;}
+
+    th {
+      text-align: left;
+      background-color: #04AA6D;
+      color: white;
+    }
+
+    //display: flex;
+    //flex-direction: column;
+    //justify-content: stretch
+    //;
+
+    //> .row {
+    //  padding: 0.5rem 0;
+    //  min-height: 1.5rem;
+    //  background-color: red;
+    //
+    //  > .cell {
+    //    padding: 0.5rem;
+    //    background-color: green;
+    //  }
+    //}
+
+    //.row .cell {
+    //  padding: 0.5rem;
+    //  box-sizing: border-box;
+    //}
+
+    //> .row {
+    //  display: flex;
+    //  min-height: 1rem;
+    //
+    //  &:first-child .cell {
+    //    display: flex;
+    //    justify-content: center; /*  center horiz. */
+    //    align-items: stretch; /*  center vert. */
+    //  }
+    //
+    //  > .cell {
+    //    //flex: 4;
+    //    border: 1px solid red;
+    //
+    //    &:nth-child(1) {
+    //      //flex: 1;
+    //    }
+    //
+    //    &:nth-child(2) {
+    //      //flex: 2;
+    //    }
+    //
+    //    &.span4-5 {
+    //      //flex: 8 24px; /*  col 4,5 flex-grow/border/padding  */
+    //    }
+    //
+    //    &.span3-4 {
+    //      //flex: 8 24px; /*  col 3,4 flex-grow/border/padding  */
+    //    }
+    //
+    //    &.span3-5 {
+    //      //flex: 12 36px; /*  col 3,4,5 flex-grow/border/padding  */
+    //    }
+    //  }
+    //}
+  }
 }
 </style>
 

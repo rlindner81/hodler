@@ -16,7 +16,7 @@
 <style lang="scss">
 @import url("https://fonts.googleapis.com/css?family=Lato");
 
-#app * {
+#app {
   font-family: "Lato", Avenir, Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
@@ -24,12 +24,13 @@
 }
 
 #nav {
-  padding: 1em;
+  padding: 1rem;
 
   a {
-    padding: 0.2em 1em;
+    padding: 0.2rem 1rem;
     font-weight: bold;
     text-decoration: none;
+    color: black;
     background-color: hsla(60, 45%, 42%, 0.15);
 
     &:hover, &.router-link-exact-active {
