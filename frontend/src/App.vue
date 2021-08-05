@@ -14,6 +14,7 @@
 </template>
 
 <style lang="scss">
+@use './scss/variables' as var;
 @import url("https://fonts.googleapis.com/css?family=Lato");
 
 #app {
@@ -31,7 +32,7 @@
     font-weight: bold;
     text-decoration: none;
     color: black;
-    background-color: hsla(60, 45%, 42%, 0.15);
+    background-color: var.$accent-1-lightest;
 
     &:hover, &.router-link-exact-active {
       background-color: white;
