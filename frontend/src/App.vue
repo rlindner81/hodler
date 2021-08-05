@@ -32,7 +32,7 @@
     font-weight: bold;
     text-decoration: none;
     color: color("black");
-    background-color: color("primary", "lighten-4");
+    background-color: color("primary", "lighten-5");
 
     &:hover, &.router-link-exact-active {
       background-color: color("white");
@@ -40,3 +40,4 @@
   }
 }
 </style>
+

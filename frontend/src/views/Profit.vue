@@ -16,33 +16,12 @@
 
 <style lang="scss">
 @import '../scss/color';
+@import '../scss/list';
 
 .profit {
   padding: 0 1rem;
 
-  .list {
-    border-collapse: collapse;
-    width: 100%;
-
-    td, th {
-      border: none;
-      padding: 0.5rem;
-    }
-    td {
-      border: solid color("primary");
-      border-width: 1px 0;
-    }
-
-    tr:nth-child(even) {
-      background-color: color("primary", "lighten-4");
-    }
-
-    th {
-      text-align: left;
-      background-color: color("primary");
-      color: color("white");
-    }
-  }
+  @include list();
 }
 </style>
 
@@ -53,8 +32,8 @@ export default {
   data() {
     return {
       stocks: [
-        { ticker: "PTON", price: 30 },
-        { ticker: "CCL", price: 12 }
+        { ticker: "PTON", price: 30.12,  },
+        { ticker: "CCL", price: 12.01 }
       ]
     };
   },
