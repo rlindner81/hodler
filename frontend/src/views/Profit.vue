@@ -25,22 +25,22 @@
     width: 100%;
 
     td, th {
-      border: 1px solid #ddd;
+      border: none;
       padding: 0.5rem;
+    }
+    td {
+      border: solid var.$accent-1-lighter;
+      border-width: 1px 0;
     }
 
     tr:nth-child(even) {
-      background-color: #f2f2f2;
-    }
-
-    tr:hover {
-      background-color: #ddd;
+      background-color: var.$accent-1-lightest;
     }
 
     th {
       text-align: left;
       background-color: var.$accent-1;
-      color: white;
+      color: var.$white;
     }
   }
 }
