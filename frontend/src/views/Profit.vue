@@ -15,7 +15,7 @@
 </template>
 
 <style lang="scss">
-@use './../scss/variables' as var;
+@import '../scss/color';
 
 .profit {
   padding: 0 1rem;
@@ -29,18 +29,18 @@
       padding: 0.5rem;
     }
     td {
-      border: solid var.$accent-1-lighter;
+      border: solid color("primary");
       border-width: 1px 0;
     }
 
     tr:nth-child(even) {
-      background-color: var.$accent-1-lightest;
+      background-color: color("primary", "lighten-4");
     }
 
     th {
       text-align: left;
-      background-color: var.$accent-1;
-      color: var.$white;
+      background-color: color("primary");
+      color: color("white");
     }
   }
 }

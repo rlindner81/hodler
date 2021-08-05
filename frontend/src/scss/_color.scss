@@ -1,0 +1,87 @@
+// https://vuetifyjs.com/en/styles/colors/#material-colors
+// https://github.com/vuetifyjs/vuetify/blob/master/packages/vuetify/src/styles/settings/_colors.scss
+
+$amber: (
+        "base": #ffc107,
+        "lighten-5": #fff8e1,
+        "lighten-4": #ffecb3,
+        "lighten-3": #ffe082,
+        "lighten-2": #ffd54f,
+        "lighten-1": #ffca28,
+        "darken-1": #ffb300,
+        "darken-2": #ffa000,
+        "darken-3": #ff8f00,
+        "darken-4": #ff6f00,
+        "accent-1": #ffe57f,
+        "accent-2": #ffd740,
+        "accent-3": #ffc400,
+        "accent-4": #ffab00
+);
+
+$light-green: (
+        "base": #8bc34a,
+        "lighten-5": #f1f8e9,
+        "lighten-4": #dcedc8,
+        "lighten-3": #c5e1a5,
+        "lighten-2": #aed581,
+        "lighten-1": #9ccc65,
+        "darken-1": #7cb342,
+        "darken-2": #689f38,
+        "darken-3": #558b2f,
+        "darken-4": #33691e,
+        "accent-1": #ccff90,
+        "accent-2": #b2ff59,
+        "accent-3": #76ff03,
+        "accent-4": #64dd17
+);
+
+$red: (
+        "base": #F44336,
+        "lighten-5": #FFEBEE,
+        "lighten-4": #FFCDD2,
+        "lighten-3": #EF9A9A,
+        "lighten-2": #E57373,
+        "lighten-1": #EF5350,
+        "darken-1": #E53935,
+        "darken-2": #D32F2F,
+        "darken-3": #C62828,
+        "darken-4": #B71C1C,
+        "accent-1": #FF8A80,
+        "accent-2": #FF5252,
+        "accent-3": #FF1744,
+        "accent-4": #D50000
+);
+
+$black: (
+        "base": #000,
+);
+
+$white: (
+        "base": #fff,
+);
+
+$grey: (
+        "base": #9e9e9e,
+        "lighten-5": #fafafa,
+        "lighten-4": #f5f5f5,
+        "lighten-3":#eeeeee,
+        "lighten-2":#e0e0e0,
+        "lighten-1":#bdbdbd,
+        "darken-1":#757575,
+        "darken-2":#616161,
+        "darken-3":#424242,
+        "darken-4":#212121
+);
+
+$colors: (
+        "primary": $amber,
+        "profit": $light-green,
+        "loss": $red,
+        "black": $black,
+        "white": $white,
+        "grey": $grey
+);
+
+@function color ($key: "primary", $modifier: "base") {
+  @return map-get(map-get($colors, $key), $modifier);
+}

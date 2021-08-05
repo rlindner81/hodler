@@ -14,14 +14,14 @@
 </template>
 
 <style lang="scss">
-@use './scss/variables' as var;
+@import 'scss/color';
 @import url("https://fonts.googleapis.com/css?family=Lato");
 
 #app {
   font-family: "Lato", Avenir, Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  color: var.$black;
+  color: color("black");
 }
 
 #nav {
@@ -31,11 +31,11 @@
     padding: 0.2rem 1rem;
     font-weight: bold;
     text-decoration: none;
-    color: var.$black;
-    background-color: var.$accent-1-lightest;
+    color: color("black");
+    background-color: color("primary", "lighten-4");
 
     &:hover, &.router-link-exact-active {
-      background-color: var.$white;
+      background-color: color("white");
     }
   }
 }
