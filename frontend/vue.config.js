@@ -18,6 +18,7 @@ module.exports = {
     }
   },
   pwa: {
+    name: "Hodler",
     workboxOptions: {
       skipWaiting: true,
       clientsClaim: true
