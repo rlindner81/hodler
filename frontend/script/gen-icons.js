@@ -46,12 +46,12 @@ const gen_png_white_bg = (name, size) => {
 
 gen_png("android-chrome-192x192", 192);
 gen_png("android-chrome-512x512", 512);
-gen_png("apple-touch-icon-60x60", 60);
-gen_png("apple-touch-icon-76x76", 76);
-gen_png("apple-touch-icon-120x120", 120);
-gen_png("apple-touch-icon-152x152", 152);
-gen_png("apple-touch-icon-180x180", 180);
-gen_png("apple-touch-icon", 180);
+gen_png_white_bg("apple-touch-icon-60x60", 60);
+gen_png_white_bg("apple-touch-icon-76x76", 76);
+gen_png_white_bg("apple-touch-icon-120x120", 120);
+gen_png_white_bg("apple-touch-icon-152x152", 152);
+gen_png_white_bg("apple-touch-icon-180x180", 180);
+gen_png_white_bg("apple-touch-icon", 180);
 gen_png("favicon-16x16", 16);
 gen_png("favicon-32x32", 32);
 gen_png("msapplication-icon-144x144", 144);
