@@ -18,8 +18,6 @@ interface Quote {
 }
 
 type ResponseQuotes = Record<"quotes", Record<"quote", Array<Quote>>>;
-type ResponseQuote = Record<"quotes", Record<"quote", Quote>>;
-let tradierToken: string | undefined;
 
 const _getToken = () => {
   if (tradierKey === undefined) {
@@ -57,7 +55,10 @@ const getMarketHistory = async (
 
 const getMarketQuotes = async (
   symbols: Array<string>,
-): Promise<ResponseQuote | ResponseQuotes> => {
+): Promise<ResponseQuotes> => {
+  if (symbols.length === 0) {
+    return { quotes: { quote: [] } };
+  }
   const tradierUrl = new URL("/v1/markets/quotes", TRADIER_HOST);
   tradierUrl.search = new URLSearchParams({ symbols: symbols.join(",") })
     .toString();
@@ -65,8 +66,11 @@ const getMarketQuotes = async (
     "Accept": "application/json",
     "Authorization": `Bearer ${_getToken()}`,
   };
-  const reponse = await fetch(tradierUrl.toString(), { headers });
-  return reponse.json();
+  const response = await fetch(tradierUrl.toString(), { headers });
+  const responseData = await response.json();
+  return symbols.length === 1
+    ? { quotes: { quote: [responseData.quotes.quote] } }
+    : responseData;
 };
 
 export { getMarketHistory, getMarketQuotes };

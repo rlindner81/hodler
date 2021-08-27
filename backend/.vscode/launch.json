@@ -2,10 +2,9 @@
   "version": "0.2.0",
   "configurations": [
     {
-      "name": "update-data",
+      "name": "current-file",
       "type": "pwa-node",
       "request": "launch",
-      //      "program": "${workspaceFolder}/src/update-data.ts",
       "cwd": "${workspaceFolder}",
       "runtimeExecutable": "deno",
       "runtimeArgs": [

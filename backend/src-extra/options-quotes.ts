@@ -1,9 +1,9 @@
-import { getMarketHistory, getMarketQuotes } from "../backend/src/util/tradier.ts";
+import { getMarketHistory, getMarketQuotes } from "../src/util/tradier.ts";
 import table from "./table.ts";
 
 const SYMBOLS = [
   // "AMD220121C00077500",
-  "BARK210820C00025000",
+  // "BARK210820C00025000",
   // "CCL220121C00012500",
   "MNMD220121C00005000",
   // "PLTR210521C00040000",
