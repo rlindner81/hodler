@@ -21,7 +21,7 @@
       "name": "options-quotes",
       "type": "pwa-node",
       "request": "launch",
-      "program": "${workspaceFolder}/src/options-quotes.ts",
+      "program": "${workspaceFolder}/src-extra/options-quotes.ts",
       "cwd": "${workspaceFolder}",
       "args": [
         "--history",
