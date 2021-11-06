@@ -5,7 +5,7 @@ import {
   getOptionExpirations,
 } from "../src/util/tradier.ts";
 import table from "./table.ts";
-import symbols from "./options-analysis-symbols.ts";
+import allsymbols from "./options-analysis-symbols.ts";
 
 const DRY_RUN = false;
 const MAX_DAYS = 35;
@@ -113,8 +113,15 @@ const _analyzeSymbol = async (symbol: string) => {
 };
 
 const main = async () => {
+  const symbols = DRY_RUN 
+  ? ["GRWG"] 
+  : Deno.args.length
+   ? Deno.args.slice().sort()
+   : allsymbols;
+  console.log("checking symbols: %s", symbols.join(","));
+
   const results = [];
-  for (const symbol of DRY_RUN ? ["GRWG"] : symbols) {
+  for (const symbol of symbols) {
     const symbolResults = await _analyzeSymbol(symbol);
     results.push(
       ...symbolResults.filter((symbolResult) =>
