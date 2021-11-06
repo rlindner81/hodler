@@ -1,0 +1,31 @@
+[
+  {
+    "symbol": "GRWG",
+    "description": "GrowGeneration Corp",
+    "exch": "Q",
+    "type": "stock",
+    "last": 22.22,
+    "change": 0.04,
+    "volume": 1394543,
+    "open": 22.25,
+    "high": 22.46,
+    "low": 21.61,
+    "close": 22.22,
+    "bid": 23.24,
+    "ask": 23.34,
+    "change_percentage": 0.18,
+    "average_volume": 366862,
+    "last_volume": 47004,
+    "trade_date": 1636142401000,
+    "prevclose": 22.18,
+    "week_52_high": 67.75,
+    "week_52_low": 18.31,
+    "bidsize": 5,
+    "bidexch": "P",
+    "bid_date": 1636156789000,
+    "asksize": 3,
+    "askexch": "Q",
+    "ask_date": 1636156763000,
+    "root_symbols": "GRWG"
+  }
+]

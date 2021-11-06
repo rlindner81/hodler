@@ -2,7 +2,7 @@ import config from "../config.ts";
 
 const TRADIER_HOST = new URL("https://sandbox.tradier.com/");
 
-const { tradierKey } = config;
+const {tradierKey} = config;
 
 // TODO wrap fetch with some error handling...
 
@@ -17,7 +17,7 @@ interface Quote {
   last: number;
 }
 
-type ResponseQuotes = Record<"quotes", Record<"quote", Array<Quote>>>;
+type ResponseQuotes = Array<Quote>;
 
 const _getToken = () => {
   if (tradierKey === undefined) {
@@ -49,7 +49,7 @@ const getMarketHistory = async (
     "Accept": "application/json",
     "Authorization": `Bearer ${_getToken()}`,
   };
-  const reponse = await fetch(tradierUrl.toString(), { headers });
+  const reponse = await fetch(tradierUrl.toString(), {headers});
   return reponse.json();
 };
 
@@ -57,20 +57,45 @@ const getMarketQuotes = async (
   symbols: Array<string>,
 ): Promise<ResponseQuotes> => {
   if (symbols.length === 0) {
-    return { quotes: { quote: [] } };
+    return [];
   }
   const tradierUrl = new URL("/v1/markets/quotes", TRADIER_HOST);
-  tradierUrl.search = new URLSearchParams({ symbols: symbols.join(",") })
+  tradierUrl.search = new URLSearchParams({symbols: symbols.join(",")})
     .toString();
   const headers = {
     "Accept": "application/json",
     "Authorization": `Bearer ${_getToken()}`,
   };
-  const response = await fetch(tradierUrl.toString(), { headers });
+  const response = await fetch(tradierUrl.toString(), {headers});
   const responseData = await response.json();
   return symbols.length === 1
-    ? { quotes: { quote: [responseData.quotes.quote] } }
+    ? [responseData.quotes.quote]
     : responseData;
 };
 
-export { getMarketHistory, getMarketQuotes };
+
+const getOptionExpirations = async (symbol: string) => {
+  const tradierUrl = new URL("/v1/markets/options/expirations", TRADIER_HOST);
+  tradierUrl.search = new URLSearchParams({symbol}).toString()
+  const headers = {
+    "Accept": "application/json",
+    "Authorization": `Bearer ${_getToken()}`,
+  };
+  const response = await fetch(tradierUrl.toString(), {headers});
+  const {expirations: {date}} = await response.json();
+  return date;
+}
+
+const getOptionChains = async (symbol: string, expiration: string) => {
+  const tradierUrl = new URL("/v1/markets/options/chains", TRADIER_HOST);
+  tradierUrl.search = new URLSearchParams({symbol, expiration}).toString()
+  const headers = {
+    "Accept": "application/json",
+    "Authorization": `Bearer ${_getToken()}`,
+  };
+  const response = await fetch(tradierUrl.toString(), {headers});
+  const {options: {option}} = await response.json();
+  return option;
+}
+
+export {getMarketHistory, getMarketQuotes, getOptionExpirations, getOptionChains};
