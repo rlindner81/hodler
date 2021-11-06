@@ -14,6 +14,11 @@ const symbols = [
   "DIS",
   "BABA",
 
+  // CHRIS
+  "STEM",
+  "CHPT",
+  "PLUG",
+
   // LONGLIST
   "NIO",
   "GRWG",
@@ -21,7 +26,7 @@ const symbols = [
   "IRBT",
   "TLRY",
   "SONO",
-  "GME",
+  // "GME",
   "LMND",
   "STOR",
   "RH",
@@ -52,7 +57,7 @@ const symbols = [
   // RANDOM
   "LCID",
   "ATVI",
-  "DWAC",
+  // "DWAC",
   "WYNN",
   "ME",
   "TWTR",
