@@ -34,9 +34,9 @@ const _getLatestExpirations = (
     .map((expiration) => _dateDiffInDays(now, new Date(expiration)))
     .filter((offset) => offset <= limit);
   const len = dates.length;
-  return len > 0
-    ? expirations.slice(Math.max(len - CHAIN_LOOKBACK - 1, 0), len - 1)
-    : null;
+  return len === 0
+    ? null
+    : expirations.slice(Math.max(len - CHAIN_LOOKBACK, 0), len);
 };
 
 const _getHighestItmPutChain = (chains: Array<any> | null, quote: any) => {
@@ -164,6 +164,7 @@ const main = async () => {
       "TO_FIXED_TWO",
       "TO_FIXED_TWO",
       "TO_FIXED_TWO",
+      null,
       "TO_FIXED_TWO",
     ],
   }));
