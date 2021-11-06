@@ -2,10 +2,12 @@ import {getMarketQuotes, getOptionExpirations, getOptionChains} from "../src/uti
 import table from "./table.ts";
 import symbols from "./options-analysis-symbols.ts";
 
-const EXPIRY_RANGE_DAYS = 35;
+const DRY_RUN = false;
+const MAX_DAYS = 35;
 const PRICE_BUFFER = 0.95;
+const RISK_CUTOFF = 4;
+
 const MILLIS_IN_DAYS = 1000 * 60 * 60 * 24;
-const DRY_RUN = true;
 
 const _dateDiffInDays = (a: Date, b: Date) => {
   const utc1 = Date.UTC(a.getFullYear(), a.getMonth(), a.getDate());
@@ -62,7 +64,7 @@ const _analyzeSymbol = async (symbol: string) => {
   const expirations = DRY_RUN
     ? JSON.parse(new TextDecoder("utf-8").decode(await Deno.readFile("../temp/option-expirations-response.json")))
     : await getOptionExpirations(symbol);
-  const expiration = _getLatestExpiration(expirations, EXPIRY_RANGE_DAYS);
+  const expiration = _getLatestExpiration(expirations, MAX_DAYS);
   if (expiration === null) {
     console.warn("could not find latest expiration for %s", symbol);
     return;
@@ -83,7 +85,7 @@ const main = async () => {
   const results = [];
   for (const symbol of DRY_RUN ? ["GRWG"] : symbols) {
     const result = await _analyzeSymbol(symbol);
-    result && results.push(result);
+    result && result.risk > RISK_CUTOFF && results.push(result);
   }
 
   const headerRow = ["stock", "price[$]", "type", "expiration", "strike[$]", "deposit[$]", "gain[$]", "risk[%]", "days"];

@@ -33,7 +33,6 @@ const symbols = [
   "CRWD",
   "SPOT",
   "WDAY",
-  "NTDOY",
   "SNOW",
   "GM",
   "T",
