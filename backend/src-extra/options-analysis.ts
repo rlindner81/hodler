@@ -120,7 +120,7 @@ const main = async () => {
    : allsymbols;
   console.log("checking symbols: %s", symbols.join(","));
 
-  const results = [];
+  const results: Array<any> = [];
   for (const symbol of symbols) {
     const symbolResults = await _analyzeSymbol(symbol);
     results.push(
@@ -158,7 +158,7 @@ const main = async () => {
       }) => [stock, price, type, expiration, strike, deposit, gain, risk, days, riskPerDay],
     ),
   );
-  console.log(table(tableData, {
+  const resultTable = table(tableData, {
     sortCol: 9,
     sortDesc: true,
     columnAlign: "lrllrrrrrr",
@@ -174,7 +174,10 @@ const main = async () => {
       null,
       "TO_FIXED_TWO",
     ],
-  }));
+  });
+  console.log(resultTable);
+  const filepath = `hodler-${new Date().toISOString().replace(/[:.]/g,"-")}.txt`;
+  resultTable && await Deno.writeTextFile(filepath, resultTable);
 };
 
 await main();
