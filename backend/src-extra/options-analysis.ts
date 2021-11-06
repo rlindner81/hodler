@@ -97,7 +97,7 @@ const main = async () => {
     result && results.push(result);
   }
 
-  const headerRow = ["stock", "price", "chain", "deposit[$]", "gain[$]", "risk[%]"];
+  const headerRow = ["stock", "price[$]", "chain", "deposit[$]", "gain[$]", "risk[%]"];
   const tableData = [headerRow].concat(
     results.map(
       ({stock, price, chain, deposit, gain, risk}) => [stock, price, chain, deposit, gain, risk,],
