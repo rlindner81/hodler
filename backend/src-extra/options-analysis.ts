@@ -34,7 +34,7 @@ const _getHighestItmPutChain = (quote: any, chains: Array<any>) => {
   const price = (quote.ask + quote.bid) / 2;
   const itmPutChains = chains
     .filter(chain => chain.strike <= price * PRICE_BUFFER && chain.option_type === "put");
-  return itmPutChains.length > 0 ? itmPutChains[itmPutChains.length - 1]: null;
+  return itmPutChains.length > 0 ? itmPutChains[itmPutChains.length - 1] : null;
 }
 
 const _analyzeChain = (quote: any, chain: any) => {
@@ -45,7 +45,7 @@ const _analyzeChain = (quote: any, chain: any) => {
     chain: chain.description,
     deposit: (100 * stockPrice).toFixed(2),
     gain: (100 * chainPrice).toFixed(2),
-    riskPercent: (chainPrice / stockPrice * 100).toFixed(2)
+    risk: (chainPrice / stockPrice * 100).toFixed(2)
   }
 }
 
@@ -79,20 +79,21 @@ const main = async () => {
     result && results.push(result);
   }
 
-  const headerRow = ["stock", "chain", "deposit", "gain", "riskPercent"];
+  const headerRow = ["stock", "chain", "deposit[$]", "gain[$]", "risk[%]"];
   const tableData = [headerRow].concat(
     results.map(
-      ({stock, chain, deposit, gain, riskPercent}) => [
+      ({stock, chain, deposit, gain, risk}) => [
         stock,
         chain,
         deposit ?? "",
         gain ?? "",
-        riskPercent ?? "",
+        risk ?? "",
       ],
     ),
   );
   console.log(table(tableData, {
     sortCol: 4,
+    sortDesc: true,
     columnAlign: "llrrr",
   }));
 };
