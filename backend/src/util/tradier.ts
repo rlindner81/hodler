@@ -82,8 +82,8 @@ const getOptionExpirations = async (symbol: string) => {
     "Authorization": `Bearer ${_getToken()}`,
   };
   const response = await fetch(tradierUrl.toString(), {headers});
-  const {expirations: {date}} = await response.json();
-  return date;
+  const responseData = await response.json();
+  return responseData.expirations?.date ?? null;
 }
 
 const getOptionChains = async (symbol: string, expiration: string) => {
@@ -94,8 +94,8 @@ const getOptionChains = async (symbol: string, expiration: string) => {
     "Authorization": `Bearer ${_getToken()}`,
   };
   const response = await fetch(tradierUrl.toString(), {headers});
-  const {options: {option}} = await response.json();
-  return option;
+  const responseData = await response.json();
+  return responseData.options?.option ?? null;
 }
 
 export {getMarketHistory, getMarketQuotes, getOptionExpirations, getOptionChains};
