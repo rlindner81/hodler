@@ -3,7 +3,8 @@ import table from "./table.ts";
 
 const SYMBOLS = [
   "GRWG",
-  "NIO",
+  "LCID",
+  // "NIO",
   // "AMD",
   // "BARK",
   // "CCL",
@@ -16,7 +17,6 @@ const SYMBOLS = [
   // "CCL",
   // "DIS",
   // "BABA",
-  // "LCID",
   // "ATVI",
   // "DWAC",
   // "WYNN",

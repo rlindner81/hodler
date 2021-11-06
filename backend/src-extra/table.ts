@@ -1,3 +1,4 @@
+type SortingCell = string | number;
 type TableCell = string | number | boolean;
 type TableRow = Array<TableCell>;
 type Table = Array<TableRow>;
@@ -9,6 +10,11 @@ interface TableOptions {
   columnAlign?: string;
   columnType?: Array<string | null>;
 }
+
+const _cellForSorting = (cell: TableCell): SortingCell =>
+  typeof cell === "number"
+  ? cell
+  : String(cell).toUpperCase()
 
 const table = (
   table: Table,
@@ -26,8 +32,8 @@ const table = (
   Number.isInteger(sortCol) &&
   sortCol < columnCount &&
   body.sort((rowA, rowB) => {
-    const cellA = rowA[sortCol] ? String(rowA[sortCol]).toUpperCase() : "";
-    const cellB = rowB[sortCol] ? String(rowB[sortCol]).toUpperCase() : "";
+    const cellA = _cellForSorting(rowA[sortCol]);
+    const cellB = _cellForSorting(rowB[sortCol]);
     return sortDesc
       ? cellA < cellB ? 1 : cellA > cellB ? -1 : 0
       : cellA < cellB ? -1 : cellA > cellB ? 1 : 0;
