@@ -2,14 +2,30 @@ import {getMarketQuotes, getOptionExpirations, getOptionChains} from "../src/uti
 import table from "./table.ts";
 
 const SYMBOLS = [
-  "AMD",
-  "BARK",
-  "CCL",
   "GRWG",
-  "MNMD",
   "NIO",
-  "PLTR",
-  "WE",
+  // "AMD",
+  // "BARK",
+  // "CCL",
+  // "MNMD",
+  // "PLTR",
+  // "WE",
+  // "TTCF",
+  // "CRSR",
+  // "STOR",
+  // "CCL",
+  // "DIS",
+  // "BABA",
+  // "LCID",
+  // "ATVI",
+  // "DWAC",
+  // "WYNN",
+  // "ME",
+  // "TWTR",
+  // "COUR",
+  // "AXON",
+  // "RBLX",
+  // "PTON"
 ];
 
 const EXPIRY_RANGE_DAYS = 35;
@@ -39,13 +55,15 @@ const _getHighestItmPutChain = (quote: any, chains: Array<any>) => {
 
 const _analyzeChain = (quote: any, chain: any) => {
   const stockPrice = (quote.ask + quote.bid) / 2;
+  const strikePrice = chain.strike;
   const chainPrice = (chain.ask + chain.bid) / 2;
   return {
     stock: quote.symbol,
+    price: stockPrice,
     chain: chain.description,
-    deposit: (100 * stockPrice).toFixed(2),
-    gain: (100 * chainPrice).toFixed(2),
-    risk: (chainPrice / stockPrice * 100).toFixed(2)
+    deposit: 100 * chain.strike,
+    gain: 100 * chainPrice,
+    risk: chainPrice / strikePrice * 100
   }
 }
 
@@ -79,22 +97,17 @@ const main = async () => {
     result && results.push(result);
   }
 
-  const headerRow = ["stock", "chain", "deposit[$]", "gain[$]", "risk[%]"];
+  const headerRow = ["stock", "price", "chain", "deposit[$]", "gain[$]", "risk[%]"];
   const tableData = [headerRow].concat(
     results.map(
-      ({stock, chain, deposit, gain, risk}) => [
-        stock,
-        chain,
-        deposit ?? "",
-        gain ?? "",
-        risk ?? "",
-      ],
+      ({stock, price, chain, deposit, gain, risk}) => [stock, price, chain, deposit, gain, risk,],
     ),
   );
   console.log(table(tableData, {
-    sortCol: 4,
+    sortCol: 5,
     sortDesc: true,
-    columnAlign: "llrrr",
+    columnAlign: "lrlrrr",
+    columnType: [null, "TO_FIXED_TWO", null, "TO_FIXED_TWO", "TO_FIXED_TWO", "TO_FIXED_TWO"]
   }));
 };
 

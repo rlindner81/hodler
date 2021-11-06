@@ -7,24 +7,17 @@ interface TableOptions {
   sortDesc?: boolean;
   noHeader?: boolean;
   columnAlign?: string;
+  columnType?: Array<string | null>;
 }
 
 const table = (
   table: Table,
-  {sortCol = 0, sortDesc = false, noHeader = false, columnAlign = ""}: TableOptions = {},
+  {sortCol = 0, sortDesc = false, noHeader = false, columnAlign = "", columnType = []}: TableOptions = {},
 ): null | string => {
   if (!table || !table.length || !table[0] || !table[0].length) {
     return null;
   }
   const columnCount = table[0].length;
-  const columnWidth = table.reduce((result, row) => {
-    row.forEach((cell, index) => {
-      if (index < columnCount) {
-        result[index] = Math.max(result[index], String(cell).length);
-      }
-    });
-    return result;
-  }, new Array(columnCount).fill(0));
 
   const header = noHeader ? [] : table[0];
   const body = noHeader ? table : table.slice(1);
@@ -40,7 +33,25 @@ const table = (
       : cellA < cellB ? -1 : cellA > cellB ? 1 : 0;
   });
 
+  body.forEach((row, rowIndex) =>
+    row.forEach((cell, columnIndex) => {
+      if (columnType.length > columnIndex && columnType[columnIndex] === "TO_FIXED_TWO") {
+        body[rowIndex][columnIndex] = Number(cell).toFixed(2);
+      }
+    })
+  );
+
   const sortedTable = noHeader ? table : [header].concat(body);
+
+  const columnWidth = sortedTable.reduce((result, row) => {
+    row.forEach((cell, index) => {
+      if (index < columnCount) {
+        result[index] = Math.max(result[index], String(cell).length);
+      }
+    });
+    return result;
+  }, new Array(columnCount).fill(0));
+
 
   return sortedTable
     .map((row, rowIndex) =>
