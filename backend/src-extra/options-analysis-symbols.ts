@@ -134,4 +134,4 @@ const symbols = [
   "PTON"
 ];
 
-export allSymbols [...new Set(symbols)].sort();
+export default [...new Set(symbols)].sort();
