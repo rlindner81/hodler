@@ -5,7 +5,7 @@ import {
   getOptionExpirations,
 } from "../src/util/tradier.ts";
 import table from "./table.ts";
-import allsymbols from "./options-analysis-symbols.ts";
+import allSymbols from "./options-analysis-symbols.ts";
 
 const DRY_RUN = false;
 const MAX_DAYS = 35;
@@ -69,7 +69,7 @@ const _analyzeChain = (quote: any, chain: any) => {
     gain: 100 * chainPrice,
     risk,
     days,
-    riskPerDay: risk/days
+    riskPerDay: risk / days,
   };
 };
 
@@ -113,11 +113,12 @@ const _analyzeSymbol = async (symbol: string) => {
 };
 
 const main = async () => {
-  const symbols = DRY_RUN 
-  ? ["GRWG"] 
-  : Deno.args.length
-   ? Deno.args.slice().sort()
-   : allsymbols;
+  const cliSymbols = Deno.args.slice().sort();
+  const symbols = DRY_RUN
+    ? ["GRWG"]
+    : cliSymbols.length
+    ? cliSymbols
+    : allSymbols;
   console.log("checking symbols: %s", symbols.join(","));
 
   const results: Array<any> = [];
@@ -155,7 +156,18 @@ const main = async () => {
         risk,
         days,
         riskPerDay,
-      }) => [stock, price, type, expiration, strike, deposit, gain, risk, days, riskPerDay],
+      }) => [
+        stock,
+        price,
+        type,
+        expiration,
+        strike,
+        deposit,
+        gain,
+        risk,
+        days,
+        riskPerDay,
+      ],
     ),
   );
   const resultTable = table(tableData, {
@@ -176,8 +188,12 @@ const main = async () => {
     ],
   });
   console.log(resultTable);
-  const filepath = `hodler-${new Date().toISOString().replace(/[:.]/g,"-")}.txt`;
-  resultTable && await Deno.writeTextFile(filepath, resultTable);
+  if (cliSymbols.length === 0 && resultTable) {
+    const filepath = `hodler-${
+      new Date().toISOString().replace(/[:.]/g, "-")
+    }.txt`;
+    await Deno.writeTextFile(filepath, resultTable);
+  }
 };
 
 await main();

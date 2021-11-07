@@ -66,7 +66,6 @@ const symbols = [
   "DOCU",
   "TWST",
   "IRDM",
-  "GBTC",
   "Z",
   "PD",
   "TRMB",
@@ -135,4 +134,4 @@ const symbols = [
   "PTON"
 ];
 
-export default [...new Set(symbols)].sort();
+export allSymbols [...new Set(symbols)].sort();
