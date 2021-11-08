@@ -25,6 +25,7 @@ const _dateDiffInDays = (a: Date, b: Date) => {
 const _getLatestExpirations = (
   expirations: Array<string> | null,
   limit: number,
+  lookback: number,
 ) => {
   if (expirations === null) {
     return null;
@@ -36,7 +37,7 @@ const _getLatestExpirations = (
   const len = dates.length;
   return len === 0
     ? null
-    : expirations.slice(Math.max(len - CHAIN_LOOKBACK, 0), len);
+    : expirations.slice(Math.max(len - lookback, 0), len);
 };
 
 const _getHighestItmPutChain = (chains: Array<any> | null, quote: any) => {
@@ -66,6 +67,7 @@ const _analyzeChain = (quote: any, chain: any) => {
     expiration: chain.expiration_date,
     strike: chain.strike,
     bid: chain.bid,
+    last: chain.last,
     ask: chain.ask,
     deposit: 100 * chain.strike,
     gain: 100 * chainPrice,
@@ -82,7 +84,7 @@ const _jsonFromFile = async (filepath: string) =>
     ),
   );
 
-const _analyzeSymbol = async (symbol: string) => {
+const _analyzeSymbol = async (symbol: string, isCliSymbols: boolean) => {
   // console.log("analyzing symbol %s", symbol);
   const results: Array<any> = [];
   const [quote] = DRY_RUN
@@ -92,7 +94,7 @@ const _analyzeSymbol = async (symbol: string) => {
   const expirations = DRY_RUN
     ? await _jsonFromFile("../temp/option-expirations-response.json")
     : await getOptionExpirations(symbol);
-  const latestExpirations = _getLatestExpirations(expirations, MAX_DAYS);
+  const latestExpirations = isCliSymbols ? expirations : _getLatestExpirations(expirations, MAX_DAYS, CHAIN_LOOKBACK);
   if (latestExpirations === null) {
     console.warn("could not find latest expirations for %s", symbol);
     return results;
@@ -119,13 +121,13 @@ const main = async () => {
   const symbols = DRY_RUN
     ? ["GRWG"]
     : cliSymbols.length
-    ? cliSymbols
-    : allSymbols;
+      ? cliSymbols
+      : allSymbols;
   console.log("checking symbols: %s", symbols.join(","));
 
   const results: Array<any> = [];
   for (const symbol of symbols) {
-    const symbolResults = await _analyzeSymbol(symbol);
+    const symbolResults = await _analyzeSymbol(symbol, !!cliSymbols.length);
     results.push(
       ...symbolResults.filter((symbolResult) =>
         symbolResult.risk > RISK_CUTOFF
@@ -140,6 +142,7 @@ const main = async () => {
     "expiration",
     "strike[$]",
     "bid",
+    "last",
     "ask",
     "deposit[$]",
     "gain[$]",
@@ -150,25 +153,27 @@ const main = async () => {
   const tableData = [headerRow].concat(
     results.map(
       ({
+         stock,
+         price,
+         type,
+         expiration,
+         strike,
+         bid,
+         last,
+         ask,
+         deposit,
+         gain,
+         risk,
+         days,
+         riskPerDay,
+       }) => [
         stock,
         price,
         type,
         expiration,
         strike,
         bid,
-        ask,
-        deposit,
-        gain,
-        risk,
-        days,
-        riskPerDay,
-      }) => [
-        stock,
-        price,
-        type,
-        expiration,
-        strike,
-        bid,
+        last,
         ask,
         deposit,
         gain,
@@ -179,14 +184,15 @@ const main = async () => {
     ),
   );
   const resultTable = table(tableData, {
-    sortCol: 11,
+    sortCol: 12,
     sortDesc: true,
-    columnAlign: "lrllrrrrrrrr",
+    columnAlign: "lrllrrrrrrrrr",
     columnType: [
       null,
       "TO_FIXED_TWO",
       null,
       null,
+      "TO_FIXED_TWO",
       "TO_FIXED_TWO",
       "TO_FIXED_TWO",
       "TO_FIXED_TWO",
