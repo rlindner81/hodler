@@ -12,6 +12,7 @@ const MAX_DAYS = 35;
 const PRICE_BUFFER = 0.95;
 const RISK_CUTOFF = 4;
 const CHAIN_LOOKBACK = 3;
+const MAX_SPREAD = 0.7;
 
 const MILLIS_IN_DAYS = 1000 * 60 * 60 * 24;
 const __dirname = path.dirname(path.fromFileUrl(import.meta.url));
@@ -35,9 +36,7 @@ const _getLatestExpirations = (
     .map((expiration) => _dateDiffInDays(now, new Date(expiration)))
     .filter((offset) => offset <= limit);
   const len = dates.length;
-  return len === 0
-    ? null
-    : expirations.slice(Math.max(len - lookback, 0), len);
+  return len === 0 ? null : expirations.slice(Math.max(len - lookback, 0), len);
 };
 
 const _getHighestItmPutChain = (chains: Array<any> | null, quote: any) => {
@@ -94,7 +93,9 @@ const _analyzeSymbol = async (symbol: string, isCliSymbols: boolean) => {
   const expirations = DRY_RUN
     ? await _jsonFromFile("../temp/option-expirations-response.json")
     : await getOptionExpirations(symbol);
-  const latestExpirations = isCliSymbols ? expirations : _getLatestExpirations(expirations, MAX_DAYS, CHAIN_LOOKBACK);
+  const latestExpirations = isCliSymbols
+    ? expirations
+    : _getLatestExpirations(expirations, MAX_DAYS, CHAIN_LOOKBACK);
   if (latestExpirations === null) {
     console.warn("could not find latest expirations for %s", symbol);
     return results;
@@ -121,16 +122,17 @@ const main = async () => {
   const symbols = DRY_RUN
     ? ["GRWG"]
     : cliSymbols.length
-      ? cliSymbols
-      : allSymbols;
+    ? cliSymbols
+    : allSymbols;
   console.log("checking symbols: %s", symbols.join(","));
 
   const results: Array<any> = [];
   for (const symbol of symbols) {
     const symbolResults = await _analyzeSymbol(symbol, !!cliSymbols.length);
     results.push(
-      ...symbolResults.filter((symbolResult) =>
-        symbolResult.risk > RISK_CUTOFF
+      ...symbolResults.filter(({ bid, ask, risk }) =>
+        risk >= RISK_CUTOFF &&
+        (ask - bid) <= MAX_SPREAD
       ),
     );
   }
@@ -153,20 +155,20 @@ const main = async () => {
   const tableData = [headerRow].concat(
     results.map(
       ({
-         stock,
-         price,
-         type,
-         expiration,
-         strike,
-         bid,
-         last,
-         ask,
-         deposit,
-         gain,
-         risk,
-         days,
-         riskPerDay,
-       }) => [
+        stock,
+        price,
+        type,
+        expiration,
+        strike,
+        bid,
+        last,
+        ask,
+        deposit,
+        gain,
+        risk,
+        days,
+        riskPerDay,
+      }) => [
         stock,
         price,
         type,
