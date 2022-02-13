@@ -14,13 +14,33 @@ const RISK_CUTOFF = 4;
 const CHAIN_LOOKBACK = 3;
 const MAX_SPREAD = 0.7;
 
-const MILLIS_IN_DAYS = 1000 * 60 * 60 * 24;
 const __dirname = path.dirname(path.fromFileUrl(import.meta.url));
 
-const _dateDiffInDays = (a: Date, b: Date) => {
-  const utc1 = Date.UTC(a.getFullYear(), a.getMonth(), a.getDate());
-  const utc2 = Date.UTC(b.getFullYear(), b.getMonth(), b.getDate());
-  return Math.floor((utc2 - utc1) / MILLIS_IN_DAYS);
+// https://www.nyse.com/markets/hours-calendars
+const BANK_HOLIDAYS = [
+  Date.UTC(2022, 1-1, 17),
+  Date.UTC(2022, 2-1, 21),
+  Date.UTC(2022, 4-1, 15),
+  Date.UTC(2022, 5-1, 30),
+  Date.UTC(2022, 6-1, 20),
+  Date.UTC(2022, 7-1, 4),
+  Date.UTC(2022, 9-1, 5),
+  Date.UTC(2022, 12-1, 26)
+]
+
+const _dateDiffInBusinessdays = (from: Date, to: Date) => {
+  let count = 0;
+  for (let current = new Date(from); current <= to; current.setDate(current.getDate() + 1)) {
+    const checkDate = Date.UTC(current.getFullYear(), current.getMonth(), current.getDate());
+    if (BANK_HOLIDAYS.includes(checkDate)) {
+      continue;
+    }
+    const dayOfWeek = current.getDay();
+    if(dayOfWeek !== 0 && dayOfWeek !== 6) {
+      count++;
+    }
+  }
+  return count;
 };
 
 const _getLatestExpirations = (
@@ -33,7 +53,7 @@ const _getLatestExpirations = (
   }
   const now = new Date();
   const dates = expirations
-    .map((expiration) => _dateDiffInDays(now, new Date(expiration)))
+    .map((expiration) => _dateDiffInBusinessdays(now, new Date(expiration)))
     .filter((offset) => offset <= limit);
   const len = dates.length;
   return len === 0 ? null : expirations.slice(Math.max(len - lookback, 0), len);
@@ -58,7 +78,7 @@ const _analyzeChain = (quote: any, chain: any) => {
   const strikePrice = chain.strike;
   const chainPrice = (chain.ask + chain.bid) / 2;
   const risk = chainPrice / strikePrice * 100;
-  const days = _dateDiffInDays(now, new Date(chain.expiration_date));
+  const businessdays = _dateDiffInBusinessdays(now, new Date(chain.expiration_date));
   return {
     stock: quote.symbol,
     price: stockPrice,
@@ -71,8 +91,8 @@ const _analyzeChain = (quote: any, chain: any) => {
     deposit: 100 * chain.strike,
     gain: 100 * chainPrice,
     risk,
-    days,
-    riskPerDay: risk / days,
+    businessdays,
+    riskPerBusinessday: risk / businessdays,
   };
 };
 
@@ -149,8 +169,8 @@ const main = async () => {
     "deposit[$]",
     "gain[$]",
     "risk[%]",
-    "days",
-    "risk/day",
+    "bdays",
+    "risk/bday",
   ];
   const tableData = [headerRow].concat(
     results.map(
@@ -166,8 +186,8 @@ const main = async () => {
         deposit,
         gain,
         risk,
-        days,
-        riskPerDay,
+        businessdays,
+        riskPerBusinessday,
       }) => [
         stock,
         price,
@@ -180,8 +200,8 @@ const main = async () => {
         deposit,
         gain,
         risk,
-        days,
-        riskPerDay,
+        businessdays,
+        riskPerBusinessday,
       ],
     ),
   );
