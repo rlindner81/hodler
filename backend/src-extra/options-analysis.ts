@@ -16,6 +16,7 @@ const MAX_SPREAD = 0.7;
 
 const __dirname = path.dirname(path.fromFileUrl(import.meta.url));
 
+// TODO handle half-days...
 // https://www.nyse.com/markets/hours-calendars
 const BANK_HOLIDAYS = [
   Date.UTC(2022, 1-1, 17),
@@ -28,6 +29,7 @@ const BANK_HOLIDAYS = [
   Date.UTC(2022, 12-1, 26)
 ]
 
+// TODO should not need loop
 const _dateDiffInBusinessdays = (from: Date, to: Date) => {
   let count = 0;
   for (let current = new Date(from); current <= to; current.setDate(current.getDate() + 1)) {
@@ -59,11 +61,13 @@ const _getLatestExpirations = (
   return len === 0 ? null : expirations.slice(Math.max(len - lookback, 0), len);
 };
 
+const _getPrice = (quote: any) => Math.min(quote.last, (quote.ask + quote.bid) / 2);
+
 const _getHighestItmPutChain = (chains: Array<any> | null, quote: any) => {
   if (chains === null) {
     return null;
   }
-  const price = (quote.ask + quote.bid) / 2;
+  const price = _getPrice(quote);
   const itmPutChains = chains
     .filter((chain) =>
       chain.strike <= price * PRICE_BUFFER && chain.option_type === "put"
@@ -74,9 +78,9 @@ const _getHighestItmPutChain = (chains: Array<any> | null, quote: any) => {
 
 const _analyzeChain = (quote: any, chain: any) => {
   const now = new Date();
-  const stockPrice = (quote.ask + quote.bid) / 2;
+  const stockPrice = _getPrice(quote);
   const strikePrice = chain.strike;
-  const chainPrice = (chain.ask + chain.bid) / 2;
+  const chainPrice = _getPrice(chain);
   const risk = chainPrice / strikePrice * 100;
   const businessdays = _dateDiffInBusinessdays(now, new Date(chain.expiration_date));
   return {
