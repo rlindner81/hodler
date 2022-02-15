@@ -5,7 +5,7 @@ import {
   getOptionExpirations,
 } from "../src/util/tradier.ts";
 import table from "./table.ts";
-import allSymbols from "./options-analysis-symbols.ts";
+import sourcesForSymbol from "./options-analysis-symbols.ts";
 
 const DRY_RUN = false;
 const MAX_DAYS = 35;
@@ -143,25 +143,28 @@ const _analyzeSymbol = async (symbol: string, isCliSymbols: boolean) => {
 
 const main = async () => {
   const cliSymbols = Deno.args.slice().sort();
+  const hasCliSymbols = !!cliSymbols.length;
   const symbols = DRY_RUN
     ? ["GRWG"]
     : cliSymbols.length
     ? cliSymbols
-    : allSymbols;
+    : Object.keys(sourcesForSymbol);
   console.log("checking symbols: %s", symbols.join(","));
 
   const results: Array<any> = [];
   for (const symbol of symbols) {
-    const symbolResults = await _analyzeSymbol(symbol, !!cliSymbols.length);
+    const sources = hasCliSymbols ? ["CLI"] : sourcesForSymbol[symbol];
+    const symbolResults = await _analyzeSymbol(symbol, hasCliSymbols);
     results.push(
       ...symbolResults.filter(({ bid, ask, risk }) =>
         risk >= RISK_CUTOFF &&
         (ask - bid) <= MAX_SPREAD
-      ),
+      ).map(result => ({ ...result, sources, })),
     );
   }
 
   const headerRow = [
+    "sources",
     "stock",
     "price[$]",
     "type",
@@ -179,6 +182,7 @@ const main = async () => {
   const tableData = [headerRow].concat(
     results.map(
       ({
+        sources,
         stock,
         price,
         type,
@@ -193,6 +197,7 @@ const main = async () => {
         businessdays,
         riskPerBusinessday,
       }) => [
+        sources,
         stock,
         price,
         type,
@@ -210,10 +215,11 @@ const main = async () => {
     ),
   );
   const resultTable = table(tableData, {
-    sortCol: 12,
+    sortCol: 13,
     sortDesc: true,
-    columnAlign: "lrllrrrrrrrrr",
+    columnAlign: "llrllrrrrrrrrr",
     columnType: [
+      null,
       null,
       "TO_FIXED_TWO",
       null,
