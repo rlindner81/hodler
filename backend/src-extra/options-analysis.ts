@@ -16,17 +16,26 @@ const MAX_SPREAD = 0.7;
 
 const __dirname = path.dirname(path.fromFileUrl(import.meta.url));
 
+interface ColumnInfo {
+  header: string;
+  field: string;
+  alignment: string;
+  columnType?: string;
+  sort?: boolean;
+}
+
+
 // TODO handle half-days...
 // https://www.nyse.com/markets/hours-calendars
 const BANK_HOLIDAYS = [
-  Date.UTC(2022, 1-1, 17),
-  Date.UTC(2022, 2-1, 21),
-  Date.UTC(2022, 4-1, 15),
-  Date.UTC(2022, 5-1, 30),
-  Date.UTC(2022, 6-1, 20),
-  Date.UTC(2022, 7-1, 4),
-  Date.UTC(2022, 9-1, 5),
-  Date.UTC(2022, 12-1, 26)
+  Date.UTC(2022, 1 - 1, 17),
+  Date.UTC(2022, 2 - 1, 21),
+  Date.UTC(2022, 4 - 1, 15),
+  Date.UTC(2022, 5 - 1, 30),
+  Date.UTC(2022, 6 - 1, 20),
+  Date.UTC(2022, 7 - 1, 4),
+  Date.UTC(2022, 9 - 1, 5),
+  Date.UTC(2022, 12 - 1, 26)
 ]
 
 // TODO should not need loop
@@ -38,7 +47,7 @@ const _dateDiffInBusinessdays = (from: Date, to: Date) => {
       continue;
     }
     const dayOfWeek = current.getDay();
-    if(dayOfWeek !== 0 && dayOfWeek !== 6) {
+    if (dayOfWeek !== 0 && dayOfWeek !== 6) {
       count++;
     }
   }
@@ -147,8 +156,8 @@ const main = async () => {
   const symbols = DRY_RUN
     ? ["GRWG"]
     : cliSymbols.length
-    ? cliSymbols
-    : Object.keys(sourcesForSymbol);
+      ? cliSymbols
+      : Object.keys(sourcesForSymbol);
   console.log("checking symbols: %s", symbols.join(","));
 
   const results: Array<any> = [];
@@ -156,84 +165,100 @@ const main = async () => {
     const sources = hasCliSymbols ? ["CLI"] : sourcesForSymbol[symbol];
     const symbolResults = await _analyzeSymbol(symbol, hasCliSymbols);
     results.push(
-      ...symbolResults.filter(({ bid, ask, risk }) =>
+      ...symbolResults.filter(({bid, ask, risk}) =>
         risk >= RISK_CUTOFF &&
         (ask - bid) <= MAX_SPREAD
-      ).map(result => ({ ...result, sources, })),
+      ).map(result => ({...result, sources,})),
     );
   }
 
-  const headerRow = [
-    "sources",
-    "stock",
-    "price[$]",
-    "type",
-    "expiration",
-    "strike[$]",
-    "bid",
-    "last",
-    "ask",
-    "deposit[$]",
-    "gain[$]",
-    "risk[%]",
-    "bdays",
-    "risk/bday",
-  ];
-  const tableData = [headerRow].concat(
-    results.map(
-      ({
-        sources,
-        stock,
-        price,
-        type,
-        expiration,
-        strike,
-        bid,
-        last,
-        ask,
-        deposit,
-        gain,
-        risk,
-        businessdays,
-        riskPerBusinessday,
-      }) => [
-        sources,
-        stock,
-        price,
-        type,
-        expiration,
-        strike,
-        bid,
-        last,
-        ask,
-        deposit,
-        gain,
-        risk,
-        businessdays,
-        riskPerBusinessday,
-      ],
-    ),
+  const columnInfos = ([] as ColumnInfo[]).concat(hasCliSymbols ? [] : [
+    {
+      header: "sources",
+      field: "sources",
+      alignment: "l",
+    },
+  ], <Array<ColumnInfo>>[
+    {
+      header: "stock",
+      field: "stock",
+      alignment: "l",
+    },
+    {
+      header: "price[$]",
+      field: "price",
+      alignment: "r",
+      columnType: "TO_FIXED_TWO"
+    },
+    {
+      header: "expiration",
+      field: "expiration",
+      alignment: "l",
+    },
+    {
+      header: "strike[$]",
+      field: "strike",
+      alignment: "r",
+      columnType: "TO_FIXED_TWO"
+    },
+    {
+      header: "bid",
+      field: "bid",
+      alignment: "r",
+      columnType: "TO_FIXED_TWO"
+    },
+    {
+      header: "last",
+      field: "last",
+      alignment: "r",
+      columnType: "TO_FIXED_TWO"
+    },
+    {
+      header: "ask",
+      field: "ask",
+      alignment: "r",
+      columnType: "TO_FIXED_TWO"
+    },
+    {
+      header: "deposit[$]",
+      field: "deposit",
+      alignment: "r"
+    },
+    {
+      header: "gain[$]",
+      field: "gain",
+      alignment: "r",
+      columnType: "TO_FIXED_TWO"
+    },
+    {
+      header: "risk[%]",
+      field: "risk",
+      alignment: "r",
+      columnType: "TO_FIXED_TWO"
+    },
+    {
+      header: "bdays",
+      field: "businessdays",
+      alignment: "r",
+    },
+    {
+      header: "risk/bday",
+      field: "riskPerBusinessday",
+      alignment: "r",
+      columnType: "TO_FIXED_TWO",
+      sort: true
+    },
+  ]);
+
+  const headerRow = columnInfos.map(({header}) => header);
+  const tableData: Array<any> = [headerRow].concat(
+    results.map(result => columnInfos.map(({field}) => result[field])),
   );
   const resultTable = table(tableData, {
-    sortCol: 13,
+    sortCol: columnInfos.findIndex(({sort}) => sort),
     sortDesc: true,
-    columnAlign: "llrllrrrrrrrrr",
-    columnType: [
-      null,
-      null,
-      "TO_FIXED_TWO",
-      null,
-      null,
-      "TO_FIXED_TWO",
-      "TO_FIXED_TWO",
-      "TO_FIXED_TWO",
-      "TO_FIXED_TWO",
-      "TO_FIXED_TWO",
-      "TO_FIXED_TWO",
-      "TO_FIXED_TWO",
-      null,
-      "TO_FIXED_TWO",
-    ],
+    columnAlign: columnInfos.map(({alignment}) => alignment).join(""),
+    columnType: columnInfos.map(({columnType}) => columnType),
   });
   console.log(resultTable);
   if (cliSymbols.length === 0 && resultTable) {

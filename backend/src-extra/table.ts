@@ -8,7 +8,7 @@ interface TableOptions {
   sortDesc?: boolean;
   noHeader?: boolean;
   columnAlign?: string;
-  columnType?: Array<string | null>;
+  columnType?: Array<string | undefined>;
 }
 
 const _cellForSorting = (cell: TableCell): SortingCell =>
