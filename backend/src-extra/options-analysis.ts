@@ -13,6 +13,7 @@ const CLI_MAX_DAYS = 60;
 const PRICE_BUFFER = 0.95;
 const RISK_CUTOFF = 2.5;
 const CHAIN_LOOKBACK = 3;
+const CLI_CHAIN_LOOKBACK = 100;
 const MAX_SPREAD = 0.7;
 
 const __dirname = path.dirname(path.fromFileUrl(import.meta.url));
@@ -128,7 +129,7 @@ const _analyzeSymbol = async (symbol: string, isCliSymbols: boolean) => {
     ? await _jsonFromFile("../temp/option-expirations-response.json")
     : await getOptionExpirations(symbol);
   const latestExpirations = isCliSymbols
-    ? _getLatestExpirations(expirations, CLI_MAX_DAYS, 100)
+    ? _getLatestExpirations(expirations, CLI_MAX_DAYS, CLI_CHAIN_LOOKBACK)
     : _getLatestExpirations(expirations, MAX_DAYS, CHAIN_LOOKBACK);
   if (latestExpirations === null) {
     console.warn("could not find latest expirations for %s", symbol);
