@@ -9,8 +9,9 @@ import sourcesForSymbol from "./options-analysis-symbols.ts";
 
 const DRY_RUN = false;
 const MAX_DAYS = 35;
+const CLI_MAX_DAYS = 60;
 const PRICE_BUFFER = 0.95;
-const RISK_CUTOFF = 4;
+const RISK_CUTOFF = 2.5;
 const CHAIN_LOOKBACK = 3;
 const MAX_SPREAD = 0.7;
 
@@ -127,7 +128,7 @@ const _analyzeSymbol = async (symbol: string, isCliSymbols: boolean) => {
     ? await _jsonFromFile("../temp/option-expirations-response.json")
     : await getOptionExpirations(symbol);
   const latestExpirations = isCliSymbols
-    ? expirations
+    ? _getLatestExpirations(expirations, CLI_MAX_DAYS, 100)
     : _getLatestExpirations(expirations, MAX_DAYS, CHAIN_LOOKBACK);
   if (latestExpirations === null) {
     console.warn("could not find latest expirations for %s", symbol);
